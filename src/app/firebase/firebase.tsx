@@ -5,12 +5,12 @@ import { initializeApp } from "firebase/app";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyC8ts14MgT3qn0lY_6kNlnZ1VVhFOuC7x4",
-  authDomain: "tetris-1c4c3.firebaseapp.com",
-  projectId: "tetris-1c4c3",
-  storageBucket: "tetris-1c4c3.appspot.com",
-  messagingSenderId: "143860219675",
-  appId: "1:143860219675:web:2afac54001081bb56a1dbe"
+  apiKey: "AIzaSyBWqDed2uOcjlubuPLO5W-ktoWf9fwG2f8",
+  authDomain: "tetris-group6.firebaseapp.com",
+  projectId: "tetris-group6",
+  storageBucket: "tetris-group6.appspot.com",
+  messagingSenderId: "1039101765147",
+  appId: "1:1039101765147:web:a963ca09a57bec98927abe"
 };
 
 // Initialize Firebase
