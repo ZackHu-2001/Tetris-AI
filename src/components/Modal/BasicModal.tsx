@@ -18,7 +18,7 @@ type BasicModalProps = {
 const BasicModal:React.FC<BasicModalProps> = ({ gameState }) => {
     
     return (
-        <div style={{backgroundColor: 'rgba(255,255,255, 0.9)'}} className='absolute w-full h-full'>
+        <div style={{backgroundColor: 'rgba(255,255,255, 0.9)'}} className='absolute w-full h-full z-20'>
             { gameState.status === null || gameState.modal === 'mainMenu' && <MainMenu />}
             { gameState.status === null || gameState.modal === 'control' && <Control />}
             { gameState.status === 'paused' || gameState.modal === 'pauseMenu' && <Pause />}

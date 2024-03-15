@@ -27,6 +27,6 @@ src
 - Develop NextPanel, PlayField, and StatusPanel concurrently, as they are closely interconnected.
 
 **Overall Milestones:**
-M1: Develop a foundational UI for single-player mode implementation     (anticipated duration: one week).
-M2: Integrate reinforcement learning into the competition mode          (anticipated duration: one week).
-M3: Dedicate time to organizing, documenting, and reporting             (anticipated duration: one week).
+- M1: Develop a foundational UI for single-player mode implementation     (anticipated duration: one week).
+- M2: Integrate reinforcement learning into the competition mode          (anticipated duration: one week).
+- M3: Dedicate time to organizing, documenting, and reporting             (anticipated duration: one week).
