@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { create } from 'zustand';
-import { useGameState } from '../gameVariable';
+import { useGameState } from '../GameState';
+import { useGameBoard } from '../GameBoard';
 
 interface timer {
     time: number,
@@ -15,7 +15,11 @@ type TimerProps = {
 
 const Timer:React.FC<TimerProps> = () => {
     const { gameState } = useGameState();
+    const { gameBoard, moveDown } = useGameBoard();
+
     const [time, setTime] = useState(0);
+
+    const moveDownInterval: number = 1;
 
     const formatTime = (time: number): string => {
         const minutes = Math.floor(time / 60);
@@ -26,17 +30,26 @@ const Timer:React.FC<TimerProps> = () => {
     }
 
     useEffect(() => {
-        let intervalId: NodeJS.Timeout | undefined; 
-    
-        if (gameState.status == 'playing') { // Checking if showTimer is true
-            intervalId = setInterval(() => { // Setting up an interval if showTimer is true
-                setTime((time) => time + 0.01); // Incrementing the time state by 1 second
-            }, 10); // Interval set to run every 1000 milliseconds (1 second)
+        let timerInterval: NodeJS.Timeout | undefined; 
+        let dropInterval: NodeJS.Timeout | undefined; 
+         
+
+        if (gameState.status == 'playing') { 
+            timerInterval = setInterval(() => { 
+                setTime((time) => time + 0.01); 
+            }, 10); 
+            dropInterval = setInterval(() => {
+                moveDown()
+            }, 1000);
         }
         
         if (gameState.status == 'paused') {
-            if (intervalId !== undefined) {
-                clearInterval(intervalId);
+            if (timerInterval !== undefined) {
+                clearInterval(timerInterval);
+            }
+            if (dropInterval !== undefined) {
+                console.log('clear')
+                clearInterval(dropInterval);
             }
         }
         
@@ -44,8 +57,11 @@ const Timer:React.FC<TimerProps> = () => {
             setTime(0);
         }
 
-        return () => clearInterval(intervalId); // Cleanup function to clear the interval when the component unmounts or showTimer changes
-    }, [gameState, setTime]); // Dependency array - useEffect will re-run whenever showTimer changes
+        return () => {
+            clearInterval(timerInterval);
+            clearInterval(dropInterval);
+         } // Cleanup function to clear the interval when the component unmounts or showTimer changes
+    }, [gameState, setTime, moveDown]); // Dependency array - useEffect will re-run whenever showTimer changes
     
     
     return <div className='w-full flex '>{formatTime(time).split('').map((char: string, index: number) => {
