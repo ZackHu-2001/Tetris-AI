@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useGameBoard } from '../GameBoard';
 
 type PlayFieldProps = {
@@ -6,7 +6,7 @@ type PlayFieldProps = {
 };
 
 const PlayField: React.FC<PlayFieldProps> = () => {
-    const { board } = useGameBoard()
+    const { board, moveDown, moveLeft, moveRight, drop } = useGameBoard()
     
     const rowNum = 20;
     const colNum = 10;
@@ -14,6 +14,36 @@ const PlayField: React.FC<PlayFieldProps> = () => {
     const initializeGame = () => {
 
     };
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            event.preventDefault;
+            switch (event.key) {
+                case 'ArrowDown': 
+                    moveDown();
+                    break;
+                case 'ArrowRight':
+                    moveRight();
+                    break;
+                case 'ArrowLeft':
+                    moveLeft();
+                    break;
+                case ' ':
+                    drop();
+                    break;
+                case 'Escape':
+                    // TODO drop the pause menu
+                    break;
+            }
+            console.log('key pressed', event.key);
+        }
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        }
+    }, []);
+    
 
     return (
         <div className='absolute w-full h-full top-0 left-0 z-10 flex flex-col'>

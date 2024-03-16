@@ -84,14 +84,14 @@ export const useGameBoard = create<gamBoardInterface>((set, get) => ({
         set((state) => {
             let canMove = true;
             state.fallingTetromino.map((row) => {
-                if (row & (2 ** 10)) {
+                if (row & 1) {
                     canMove = false;
                 }
             });
 
             if (canMove) {
                 const newTetromino = state.fallingTetromino.map((row) => {
-                    row = row << 1;
+                    row = row >> 1;
                     return row;
                 });
                 return { fallingTetromino: newTetromino };
@@ -109,7 +109,7 @@ export const useGameBoard = create<gamBoardInterface>((set, get) => ({
         set((state) => {
             let canMove = true;
             state.fallingTetromino.map((row) => {
-                if (!(row & 1)) {
+                if ((row & (1 << 9))) {
                     canMove = false;
                 }
             });
@@ -131,16 +131,13 @@ export const useGameBoard = create<gamBoardInterface>((set, get) => ({
     moveDown: () => {
         set((state) => {
             function canMoveDown() {
-                console.log(state.fallingTetromino, state.fallingTetromino[state.fallingTetromino.length - 1])
                 if (state.fallingTetromino[state.fallingTetromino.length - 1]) {
-                    console.log(state.fallingTetromino)
                     return false;
                 }
 
                 const newTetromino = [0].concat(state.fallingTetromino.slice(0, -1));
                 for (let i = 0; i < state.fallingTetromino.length; i++) {
                     if (state.gameBoard[i] & newTetromino[i]) {
-                        console.log(state.gameBoard[i], newTetromino[i])
                         return false;
                     }
                 }
