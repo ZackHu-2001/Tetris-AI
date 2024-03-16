@@ -3,26 +3,21 @@ import MainMenu from './MainMenu';
 import Control from './Control';
 import Pause from './Pause';
 import Setting from './Setting';
-
-
-type GameState = {
-    status: 'paused' | 'playing' | 'gameover' | null,
-    mode: 'sprint' | 'competition' | 'endless' | null,
-    modal: 'mainMenu' | 'pauseMenu' | 'control' | 'setting' | null
-  }
+import { useGameState } from '../GameState';
 
 type BasicModalProps = {
-    gameState: GameState
 };
 
-const BasicModal:React.FC<BasicModalProps> = ({ gameState }) => {
-    
+const BasicModal: React.FC<BasicModalProps> = () => {
+    const { gameState } = useGameState();
+
     return (
-        <div style={{backgroundColor: 'rgba(255,255,255, 0.9)'}} className='absolute w-full h-full z-20'>
-            { gameState.status === null || gameState.modal === 'mainMenu' && <MainMenu />}
-            { gameState.status === null || gameState.modal === 'control' && <Control />}
-            { gameState.status === 'paused' || gameState.modal === 'pauseMenu' && <Pause />}
-            { gameState.status === null || gameState.modal === 'setting' && <Setting />}
+
+        gameState.modal === null ? <></> : <div style={{ backgroundColor: 'rgba(255,255,255, 0.9)' }} className='absolute w-full h-full z-20'>
+            {gameState.status === null && gameState.modal === 'mainMenu' && <MainMenu />}
+            {gameState.status === null && gameState.modal === 'control' && <Control />}
+            {gameState.status === 'paused' && gameState.modal === 'pauseMenu' && <Pause />}
+            {gameState.status === null && gameState.modal === 'setting' && <Setting />}
         </div>
     )
 }
