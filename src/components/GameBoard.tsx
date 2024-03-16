@@ -5,7 +5,7 @@ export type GameBoard = number[];
 export const rowNum = 20;
 export const colNum = 10;
 
-interface gamBoardInterface {
+interface gameBoardInterface {
     gameBoard: GameBoard;
     addTetromino: (tetromino: Tetromino) => void;
     initializeGameBoard: () => void;
@@ -18,7 +18,6 @@ interface gamBoardInterface {
     drop: () => void;
     clockWiseRotate: () => void;
     anticlockWiseRotate: () => void;
-    getDropPosition: () => GameBoard;
 
     board: GameBoard;
     updateBoard: () => void;
@@ -28,7 +27,34 @@ interface gamBoardInterface {
     pop: () => Tetromino;
 }
 
-export const useGameBoard = create<gamBoardInterface>((set, get) => ({
+/**
+ * Get the final postion of the tetromino, if let it drop
+ * @param state 
+ * @returns 
+ */
+const getDropPosition = (state: gameBoardInterface): Tetromino => {
+    let nextPosition: Tetromino = [...state.fallingTetromino];
+
+    function canMoveDown(tetromino: Tetromino) {
+        if (tetromino[tetromino.length - 1]) {
+            return false;
+        }
+
+        const newTetromino = [0].concat(state.fallingTetromino.slice(0, -1));
+        for (let i = 0; i < state.fallingTetromino.length; i++) {
+            if (state.gameBoard[i] & newTetromino[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+    while (canMoveDown(nextPosition)) {
+        nextPosition = [0].concat(nextPosition.slice(0, -1));
+    }
+    return nextPosition;
+}
+
+export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     board: [],
 
     updateBoard: () => {
@@ -37,7 +63,7 @@ export const useGameBoard = create<gamBoardInterface>((set, get) => ({
             for (let i = 0; i < rowNum; i++) {
                 newBoard[i] = state.gameBoard[i] | state.fallingTetromino[i]
             }
-            return { board: newBoard }        
+            return { board: newBoard }
         })
     },
 
@@ -57,7 +83,7 @@ export const useGameBoard = create<gamBoardInterface>((set, get) => ({
 
     initializeGameBoard: () => {
         set((state) => {
-            
+
             return { gameBoard: Array(rowNum).fill(0) }
         })
         get().updateBoard()
@@ -73,7 +99,7 @@ export const useGameBoard = create<gamBoardInterface>((set, get) => ({
 
     setFallingTetromino: (tetromino: GameBoard) => {
         const tetrominoCopy: GameBoard = [...tetromino]
-        for (let i=0; i<tetromino.length; i++) {
+        for (let i = 0; i < tetromino.length; i++) {
             tetrominoCopy[i] = tetrominoCopy[i] << 3
         }
         set({ fallingTetromino: tetrominoCopy.concat(Array(20 - tetrominoCopy.length).fill(0)) })
@@ -125,7 +151,7 @@ export const useGameBoard = create<gamBoardInterface>((set, get) => ({
             }
         });
         get().updateBoard()
-        
+
     },
 
     moveDown: () => {
@@ -166,13 +192,7 @@ export const useGameBoard = create<gamBoardInterface>((set, get) => ({
 
     drop: () => {
         set((state) => {
-            const newTetromino = state.fallingTetromino.map((row) => {
-                if (!(row & (2 ** 10))) {
-                    row = row << 1;
-                }
-                return row;
-            });
-            return { fallingTetromino: [0].concat(state.fallingTetromino.slice(0, -1)) };
+            return { fallingTetromino: getDropPosition(state) };
         });
         get().updateBoard()
 
@@ -206,10 +226,6 @@ export const useGameBoard = create<gamBoardInterface>((set, get) => ({
 
     },
 
-    getDropPosition: () => {
-        // TODO
-
-    },
 
     nextTetrominoQueue: [] as Tetromino[],
 
@@ -261,4 +277,3 @@ export const getRandomTetromino = () => {
     const randomTetromino = tetrominos[tetrominosKey[randomIndex]];
     return randomTetromino;
 };
- 
