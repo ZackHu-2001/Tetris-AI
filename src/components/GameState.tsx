@@ -15,15 +15,9 @@ interface GameStateStateInterface {
 
 export const useGameState = create<GameStateStateInterface>((set, get) => ({
     gameState: { status: null, mode: null, modal: 'mainMenu' },
-    setStatus: (status: GameState['status']) => {
-        get().gameState.status = status;
-    },
-    setMode: (mode: GameState['mode']) => {
-        get().gameState.mode = mode;
-    },
-    setModal: (modal: GameState['modal']) => {
-        get().gameState.modal = modal;
-    },
+    setStatus: (status: GameState['status']) => set((state) => ({ gameState: { ...state.gameState, status } })),
+    setMode: (mode: GameState['mode']) => set((state) => ({ gameState: { ...state.gameState, mode } })),
+    setModal: (modal: GameState['modal']) => set((state) => ({ gameState: { ...state.gameState, modal } })),
 }));
 
 
