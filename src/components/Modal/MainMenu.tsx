@@ -3,6 +3,7 @@ import { useGameState } from '@/components/GameState';
 import { getRandomTetromino } from '@/components/GameBoard'
 import { useGameBoard, rowNum, Tetromino } from '@/components/GameBoard';
 import MenuButton from '../MenuButton/MenuButton';
+import { CiSettings } from "react-icons/ci";
 
 type MainMenuProps = {};
 
@@ -14,8 +15,16 @@ const MainMenu:React.FC<MainMenuProps> = () => {
         // initialize nextTetrominoQueue
         for (let i = 0; i < 7; i++) {
             append(getRandomTetromino());
-        }    
+        }
 
+        // initialize game board
+        initializeGameBoard();
+
+        // initialize fallingTetromino
+        setFallingTetromino(getRandomTetromino());
+
+        // initialize timer
+        
         // change global game state
         setStatus('playing');
         setMode('sprint');
@@ -29,6 +38,14 @@ const MainMenu:React.FC<MainMenuProps> = () => {
     const handlePause = () => {
         setStatus('paused');
         setModal('pauseMenu');
+    }
+
+    const handleControl = () => {
+        setModal('control');
+    }
+
+    const handleSetting = () => {
+        setModal('setting');
     }
     
     const handlePop = () => {
@@ -45,9 +62,10 @@ const MainMenu:React.FC<MainMenuProps> = () => {
         <div className='absolute w-full h-full left-0 top-0 flex flex-col justify-center items-center'>
             Tetris
 
-            <MenuButton text="start" onClick={handleStart}></MenuButton>
-            <MenuButton text="Pop" onClick={handlePop}></MenuButton>
-            <MenuButton text="Pause" onClick={handlePause}></MenuButton>
+            <MenuButton text="Start" onClick={handleStart}></MenuButton>
+            {/* <MenuButton text="Pause" onClick={handlePause}></MenuButton> */}
+            <MenuButton text="Control" onClick={handleControl}></MenuButton>
+            <MenuButton text="Setting" onClick={handleSetting} icon={<CiSettings className=' inline'/>}></MenuButton>
         </div>
     )
 }

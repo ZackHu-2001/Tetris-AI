@@ -1,26 +1,32 @@
 import React from 'react';
 import MenuButton from '../MenuButton/MenuButton';
+import { useGameState } from '../GameState';
 
-type PauseProps = {
-
-};
+type PauseProps = {};
 
 const Pause: React.FC<PauseProps> = () => {
+    const { setStatus, setModal } = useGameState();
     const handleReturn = () => {
-        console.log('return')
+        setStatus("playing")
+        setModal(null)
     }
+
     const handleRetry = () => {
-        console.log('retry')
+
     }
+
     const handleClickMainMenu = () => {
-        console.log('main menu')
+        setStatus(null)
+        setModal('mainMenu')
+        // reset timer
+
     }
 
     return <div className='w-full h-full flex flex-col justify-center items-center'>
         <div>Paused</div>
-        <MenuButton text='Return' onClick={handleReturn}>Return</MenuButton>
-        <MenuButton text='Retry' onClick={handleRetry}>Return</MenuButton>
-        <MenuButton text='Main Menu' onClick={handleClickMainMenu}>Return</MenuButton>
+        <MenuButton text='Return' onClick={handleReturn}></MenuButton>
+        <MenuButton text='Retry' onClick={handleRetry}></MenuButton>
+        <MenuButton text='Main Menu' onClick={handleClickMainMenu}></MenuButton>
     </div>
 }
 export default Pause;
