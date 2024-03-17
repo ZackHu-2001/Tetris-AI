@@ -33,7 +33,6 @@ const Timer:React.FC<TimerProps> = () => {
         let timerInterval: NodeJS.Timeout | undefined; 
         let dropInterval: NodeJS.Timeout | undefined; 
          
-
         if (gameState.status == 'playing') { 
             timerInterval = setInterval(() => { 
                 setTime((time) => time + 0.01); 
@@ -48,7 +47,6 @@ const Timer:React.FC<TimerProps> = () => {
                 clearInterval(timerInterval);
             }
             if (dropInterval !== undefined) {
-                console.log('clear')
                 clearInterval(dropInterval);
             }
         }
@@ -61,7 +59,7 @@ const Timer:React.FC<TimerProps> = () => {
             clearInterval(timerInterval);
             clearInterval(dropInterval);
          } // Cleanup function to clear the interval when the component unmounts or showTimer changes
-    }, [gameState, setTime, moveDown]); // Dependency array - useEffect will re-run whenever showTimer changes
+    }, [gameState, setTime, moveDown]); 
     
     
     return <div className='w-full flex '>{formatTime(time).split('').map((char: string, index: number) => {
