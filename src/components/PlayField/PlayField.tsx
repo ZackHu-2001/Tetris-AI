@@ -1,13 +1,12 @@
 import React, { useEffect } from 'react';
 import { useGameBoard } from '../GameBoard';
+import { useGameState } from '../GameState';
 
-type PlayFieldProps = {
-
-};
+type PlayFieldProps = {};
 
 const PlayField: React.FC<PlayFieldProps> = () => {
     const { board, moveDown, moveLeft, moveRight, drop } = useGameBoard()
-    
+    const { setStatus, setModal } = useGameState();
     const rowNum = 20;
     const colNum = 10;
 
@@ -16,7 +15,7 @@ const PlayField: React.FC<PlayFieldProps> = () => {
     };
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
-            event.preventDefault;
+            event.preventDefault();
             switch (event.key) {
                 case 'ArrowDown': 
                     moveDown();
@@ -31,7 +30,10 @@ const PlayField: React.FC<PlayFieldProps> = () => {
                     drop();
                     break;
                 case 'Escape':
-                    // TODO drop the pause menu
+                    // TODO show the pause menu
+                    setStatus('paused');
+                    setModal('pauseMenu');
+
                     break;
             }
             console.log('key pressed', event.key);
