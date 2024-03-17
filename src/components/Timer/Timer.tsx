@@ -65,7 +65,7 @@ const Timer:React.FC<TimerProps> = () => {
     
     
     return <div className='w-full flex '>{formatTime(time).split('').map((char: string, index: number) => {
-        return <div style={{width: '8rem'}} className=' flex justify-center'>{char}</div>
+        return <div key={index} className='timer-char'>{char}</div>
     })}</div>
 }
 export default Timer;
