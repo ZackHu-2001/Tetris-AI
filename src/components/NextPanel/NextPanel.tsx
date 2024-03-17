@@ -1,63 +1,33 @@
-// import React from 'react';
-// import { useGameBoard} from '@/components/GameBoard'
-// type NextPanelProps = {
 
-// };
-
-// const NextPanel: React.FC<NextPanelProps> = () => {
-//     const { nextTetrominoQueue } = useGameBoard();
-
-//     return (
-//         <div className='w-1/6 h-[100vh] flex flex-col items-center'>
-//             Next
-
-//             {nextTetrominoQueue.map((tetromino, index) => (
-//                 <div key={index}>
-//                     {tetromino}
-//                 </div>
-//             ))}
-//         </div>
-//     )
-// }
-// export default NextPanel;
 
 import React from 'react';
 import { useGameBoard, tetrominos} from '@/components/GameBoard'; // Ensure correct path
 
 
-// const binaryToTypeMapping = Object.entries(tetrominos).reduce((acc, [type, shapes]) => {
-//     // Assuming shapes are unique across types, which might need verification
-//     shapes.forEach(shape => {
-//         // The key is the binary representation as a string; value is the type
-//         acc[shape.toString()] = type;gut pull
-//     });
-//     return acc;
-// }, {});
-
-// Annotating the `filled` prop type directly in the parameter list
 const TetrominoBlock = ({ filled }: { filled: boolean }) => (
-    <div className={`w-4 h-4 m-[-1px] ${filled ? 'bg-red-500' : 'bg-transparent'} border border-gray-200`}></div>
+    <div className={`w-4 h-4 ${filled ? 'bg-red-500' : 'bg-transparent'} border border-gray-200`}></div>
 );
 
-
 const NextTetromino = ({ tetromino }: { tetromino: number[] }) => {
-    const cols = 4;
+    const cols = 4; // Assuming a standard width for tetrominos
+
     return (
-        <div className='flex flex-col items-center mb-2 p-[1px]'> {/* Add slight padding */}
+        <div className='grid grid-cols-4 gap-px items-center mb-2'>
             {tetromino.map((row, rowIndex) => (
-                <div key={rowIndex} className='flex'>
-                    {Array.from({ length: cols }).map((_, colIndex) => {
-                        const isFilled = !!(row & (1 << (cols - 1 - colIndex)));
-                        return isFilled ? (
-                            <TetrominoBlock key={colIndex} filled={true} />
-                        ) : null;
-                    })}
-                </div>
+                Array.from({ length: cols }).map((_, colIndex) => {
+                    const isFilled = !!(row & (1 << (cols - 1 - colIndex)));
+                    // Render TetrominoBlock for filled cells, otherwise render a placeholder for spacing
+                    return isFilled ? (
+                        <TetrominoBlock key={`${rowIndex}-${colIndex}`} filled={true} />
+                    ) : (
+                        // Use an empty div with the same dimensions but no border for spacing in the grid
+                        <div key={`${rowIndex}-${colIndex}`} className="w-4 h-4 bg-transparent"></div>
+                    );
+                })
             ))}
         </div>
     );
 };
-
 const NextPanel = () => {
     const { nextTetrominoQueue } = useGameBoard(); 
 
