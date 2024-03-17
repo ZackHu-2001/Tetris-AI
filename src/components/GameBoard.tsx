@@ -31,33 +31,40 @@ interface gameBoardInterface {
   addScore: (score: number) => void;
   checkAndClearLines: () => void;
 }
-
 /**
- * Get the final postion of the tetromino, if let it drop
- * @param state
- * @returns
+ * 
+ * @param tetromino 
+ * @param state 
+ * @returns 
  */
-const getDropPosition = (state: gameBoardInterface): Tetromino => {
-  let nextPosition: Tetromino = [...state.fallingTetromino];
-
-  function canMoveDown(tetromino: Tetromino) {
+function canMoveDown(tetromino: Tetromino, state: gameBoardInterface) {
     if (tetromino[tetromino.length - 1]) {
-      return false;
+        return false;
     }
 
     const newTetromino = [0].concat(state.fallingTetromino.slice(0, -1));
     for (let i = 0; i < state.fallingTetromino.length; i++) {
-      if (state.gameBoard[i] & newTetromino[i]) {
-        return false;
-      }
+        if (state.gameBoard[i] & newTetromino[i]) {
+            return false;
+        }
     }
     return true;
-  }
-  while (canMoveDown(nextPosition)) {
-    nextPosition = [0].concat(nextPosition.slice(0, -1));
-  }
-  return nextPosition;
-};
+}
+
+/**
+ * Get the final postion of the tetromino, if let it drop
+ * @param state 
+ * @returns 
+ */
+const getDropPosition = (state: gameBoardInterface): Tetromino => {
+    let nextPosition: Tetromino = [...state.fallingTetromino];
+
+
+    while (canMoveDown(nextPosition, state)) {
+        nextPosition = [0].concat(nextPosition.slice(0, -1));
+    }
+    return nextPosition;
+}
 
 export const useGameBoard = create<gameBoardInterface>((set, get) => ({
   board: [],
@@ -93,9 +100,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     get().updateBoard();
   },
 
-  fallingTetromino: [],
-
-  canMoveDown: () => {},
+    fallingTetromino: [],
 
   setFallingTetromino: (tetromino: GameBoard) => {
     const tetrominoCopy: GameBoard = [...tetromino];
@@ -132,28 +137,28 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     get().updateBoard();
   },
 
-  // first check if attach the wall, if not then move
-  moveRight: () => {
-    set((state) => {
-      let canMove = true;
-      state.fallingTetromino.map((row) => {
-        if (row & (1 << 9)) {
-          canMove = false;
-        }
-      });
-
-      if (canMove) {
-        const newTetromino = state.fallingTetromino.map((row) => {
-          row = row << 1;
-          return row;
+    // first check if attach the wall, if not then move
+    moveRight: () => {
+        set((state) => {
+            let canMove = true;
+            state.fallingTetromino.map((row) => {
+                if ((row & (1 << 9))) {
+                    canMove = false;
+                }
+            });
+            if (canMove) {
+                const newTetromino = state.fallingTetromino.map((row) => {
+                    row = row << 1;
+                    return row;
+                });
+                return { fallingTetromino: newTetromino };
+            } else {
+                return { fallingTetromino: state.fallingTetromino };
+            }
         });
-        return { fallingTetromino: newTetromino };
-      } else {
-        return { fallingTetromino: state.fallingTetromino };
-      }
-    });
-    get().updateBoard();
-  },
+        get().updateBoard()
+
+    },
 
   moveDown: () => {
     set((state) => {
@@ -162,39 +167,52 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
           return false;
         }
 
-        const newTetromino = [0].concat(state.fallingTetromino.slice(0, -1));
-        for (let i = 0; i < state.fallingTetromino.length; i++) {
-          if (state.gameBoard[i] & newTetromino[i]) {
-            return false;
-          }
-        }
-        return true;
-      }
-      // annonymous function to determine if can move down
-      if (canMoveDown()) {
-        return {
-          fallingTetromino: [0].concat(state.fallingTetromino.slice(0, -1)),
-        };
-      } else {
-        // TODO handle attach
+                const newTetromino = [0].concat(state.fallingTetromino.slice(0, -1));
+                for (let i = 0; i < state.fallingTetromino.length; i++) {
+                    if (state.gameBoard[i] & newTetromino[i]) {
+                        return false;
+                    }
+                }
+                return true;
+            }
 
+            // annonymous function to determine if can move down
+            if (canMoveDown()) {
+
+                return { fallingTetromino: [0].concat(state.fallingTetromino.slice(0, -1)) };
+
+            } else {
+                // TODO handle attach
+
+                // add current falling tetromino to the game board
+                get().addTetromino(get().fallingTetromino);
+                console.log(get().gameBoard)
+
+                // pop the next element
+                get().setFallingTetromino(get().pop())
+                console.log(get().fallingTetromino)
+                return { fallingTetromino: state.fallingTetromino };
+
+            }
+        });
+        get().updateBoard()
+
+    },
+
+    drop: () => {
+        set((state) => {
+            return { fallingTetromino: getDropPosition(state) };
+        });
         // add current falling tetromino to the game board
         get().addTetromino(get().fallingTetromino);
 
         // pop the next element
-        get().setFallingTetromino(get().pop());
-        return { fallingTetromino: state.fallingTetromino };
-      }
-    });
-    get().updateBoard();
-  },
+        get().setFallingTetromino(get().pop())
+        console.log(get().gameBoard)
+        console.log(get().fallingTetromino)
+        get().updateBoard()
 
-  drop: () => {
-    set((state) => {
-      return { fallingTetromino: getDropPosition(state) };
-    });
-    get().updateBoard();
-  },
+    },
 
   clockWiseRotate: () => {
     set((state) => {
@@ -278,15 +296,6 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     });
   },
 }));
-
-// const attachDetaction = (gameboard: GameBoard, tetromino: GameBoard) => {
-//     gameboard.map((row, rowIndex) => {
-//         if (tetromino[rowIndex] & row) {
-//             return true;
-//         }
-//     })
-//     return false;
-// }
 
 export const tetrominos: Record<string, Tetromino> = {
   I: [15],
