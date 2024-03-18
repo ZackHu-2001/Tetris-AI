@@ -30,6 +30,9 @@ interface gameBoardInterface {
     lines: number;
     addScore: (score: number) => void;
     checkAndClearLines: () => void;
+
+    isNewGame: boolean;
+    setIsNewGame: (isNewGame: boolean) => void;
 }
 
 /**
@@ -290,6 +293,11 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             };
         });
     },
+    
+    isNewGame: false,
+    setIsNewGame: (isNewGame: boolean) => {
+        set({ isNewGame });
+    }
 }));
 
 export const tetrominos: Record<string, Tetromino> = {
