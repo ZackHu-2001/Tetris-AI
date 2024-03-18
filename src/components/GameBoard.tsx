@@ -36,7 +36,7 @@ interface gameBoardInterface {
 }
 
 /**
- * 
+ * Tell if the current tetromino can move down
  * @param tetromino 
  * @param state 
  * @returns 
@@ -293,7 +293,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             };
         });
     },
-    
+
     isNewGame: false,
     setIsNewGame: (isNewGame: boolean) => {
         set({ isNewGame });

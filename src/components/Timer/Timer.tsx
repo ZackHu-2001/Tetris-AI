@@ -2,20 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useGameState } from '../GameState';
 import { useGameBoard } from '../GameBoard';
 
-interface timer {
-    time: number,
-    start: () => void,
-    pause: () => void,
-    reset: () => void,
-}
 
-type TimerProps = {
-    
-};
+type TimerProps = {};
 
-const Timer:React.FC<TimerProps> = () => {
+const Timer: React.FC<TimerProps> = () => {
     const { gameState } = useGameState();
-    const { gameBoard, moveDown } = useGameBoard();
+    const { moveDown, isNewGame, setIsNewGame } = useGameBoard();
 
     const [time, setTime] = useState(0);
 
@@ -30,18 +22,22 @@ const Timer:React.FC<TimerProps> = () => {
     }
 
     useEffect(() => {
-        let timerInterval: NodeJS.Timeout | undefined; 
-        let dropInterval: NodeJS.Timeout | undefined; 
-         
-        if (gameState.status == 'playing') { 
-            timerInterval = setInterval(() => { 
-                setTime((time) => time + 0.01); 
-            }, 10); 
+        let timerInterval: NodeJS.Timeout | undefined;
+        let dropInterval: NodeJS.Timeout | undefined;
+
+        if (gameState.status == 'playing') {
+            if (isNewGame) {
+                setIsNewGame(false);
+                setTime(0);
+            }
+            timerInterval = setInterval(() => {
+                setTime((time) => time + 0.01);
+            }, 10);
             dropInterval = setInterval(() => {
                 moveDown()
             }, 1000);
         }
-        
+
         if (gameState.status == 'paused') {
             if (timerInterval !== undefined) {
                 clearInterval(timerInterval);
@@ -50,7 +46,7 @@ const Timer:React.FC<TimerProps> = () => {
                 clearInterval(dropInterval);
             }
         }
-        
+
         if (gameState.status == 'gameover') {
             setTime(0);
         }
@@ -58,10 +54,10 @@ const Timer:React.FC<TimerProps> = () => {
         return () => {
             clearInterval(timerInterval);
             clearInterval(dropInterval);
-         } // Cleanup function to clear the interval when the component unmounts or showTimer changes
-    }, [gameState, setTime, moveDown]); 
-    
-    
+        } // Cleanup function to clear the interval when the component unmounts or showTimer changes
+    }, [gameState, setTime, moveDown]);
+
+
     return <div className='w-full flex '>{formatTime(time).split('').map((char: string, index: number) => {
         return <div key={index} className='timer-char'>{char}</div>
     })}</div>
