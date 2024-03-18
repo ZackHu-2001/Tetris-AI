@@ -32,7 +32,7 @@ const NextPanel = () => {
     const { nextTetrominoQueue } = useGameBoard(); 
 
     return (
-        <div className='w-1/6 h-screen flex flex-col items-center p-4'>
+        <div style={{width: '12.5%'}} className='flex flex-col items-center p-4'>
             <span className='text-lg font-bold mb-4'>Next</span>
             {nextTetrominoQueue.map((tetromino, index) => (
                 // Add a margin class to the div wrapping the NextTetromino component

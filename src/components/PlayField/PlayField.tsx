@@ -48,7 +48,7 @@ const PlayField: React.FC<PlayFieldProps> = () => {
     
 
     return (
-        <div className='absolute w-full h-full top-0 left-0 z-10 flex flex-col'>
+        <div className='absolute w-full h-full top-0 left-0 z-10 flex flex-col '>
             {board.map((row, rowIndex) => {
                 return (<div style={{height: '5%'}} className='w-full flex ' key={rowIndex}>
                     {Array.from({ length: colNum }).map((_, i) => {

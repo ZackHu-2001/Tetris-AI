@@ -59,10 +59,10 @@ const MainMenu:React.FC<MainMenuProps> = () => {
     }
     
     return (
-        <div className='absolute w-full h-full left-0 top-0 flex flex-col justify-center items-center'>
+        <div style={{fontSize: '5rem', fontWeight: 'bold'}} className='absolute w-full h-full left-0 top-0 flex flex-col justify-center items-center'>
             Tetris
 
-            <MenuButton text="Start" onClick={handleStart}></MenuButton>
+            <MenuButton text="Play Sprint" onClick={handleStart}></MenuButton>
             {/* <MenuButton text="Pause" onClick={handlePause}></MenuButton> */}
             <MenuButton text="Control" onClick={handleControl}></MenuButton>
             <MenuButton text="Setting" onClick={handleSetting} icon={<CiSettings className=' inline'/>}></MenuButton>

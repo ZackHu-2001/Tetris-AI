@@ -22,7 +22,7 @@ const Pause: React.FC<PauseProps> = () => {
 
     }
 
-    return <div className='w-full h-full flex flex-col justify-center items-center'>
+    return <div style={{fontSize: '5rem', fontWeight: 'bold'}} className='w-full h-full flex flex-col justify-center items-center'>
         <div>Paused</div>
         <MenuButton text='Return' onClick={handleReturn}></MenuButton>
         <MenuButton text='Retry' onClick={handleRetry}></MenuButton>
