@@ -1,33 +1,33 @@
 
 
 import React from 'react';
-import { useGameBoard, tetrominos} from '@/components/GameBoard'; // Ensure correct path
+import { useGameBoard } from '@/components/GameBoard'; // Ensure correct path
 
-
-const TetrominoBlock = ({ filled }: { filled: boolean }) => (
-    <div className={`w-4 h-4 ${filled ? 'bg-red-500' : 'bg-transparent'} border border-gray-200`}></div>
+// Annotating the `filled` prop type directly in the parameter list
+const TetrominoBlock = ({filled}: {filled: boolean}) => (
+    <div className={`w-4 h-4 ${filled ? 'bg-red-500 border border-gray-200' : 'bg-transparent'} box-border`}></div>
 );
+
 
 const NextTetromino = ({ tetromino }: { tetromino: number[] }) => {
     const cols = 4; // Assuming a standard width for tetrominos
-
     return (
-        <div className='grid grid-cols-4 gap-px items-center mb-2'>
+        <div className='flex flex-col'>
             {tetromino.map((row, rowIndex) => (
-                Array.from({ length: cols }).map((_, colIndex) => {
-                    const isFilled = !!(row & (1 << (cols - 1 - colIndex)));
-                    // Render TetrominoBlock for filled cells, otherwise render a placeholder for spacing
-                    return isFilled ? (
-                        <TetrominoBlock key={`${rowIndex}-${colIndex}`} filled={true} />
-                    ) : (
-                        // Use an empty div with the same dimensions but no border for spacing in the grid
-                        <div key={`${rowIndex}-${colIndex}`} className="w-4 h-4 bg-transparent"></div>
-                    );
-                })
+                <div key={rowIndex} className='flex'>
+                    {Array.from({ length: cols }).map((_, colIndex) => {
+                        const isFilled = !!(row & (1 << (cols - 1 - colIndex)));
+                        return (
+                            <TetrominoBlock key={colIndex} filled={isFilled}/>
+                            )
+                         // Return null for empty cells, so they don't get rendered
+                    })}
+                </div>
             ))}
         </div>
     );
 };
+
 const NextPanel = () => {
     const { nextTetrominoQueue } = useGameBoard(); 
 
@@ -45,3 +45,4 @@ const NextPanel = () => {
 };
 
 export default NextPanel;
+
