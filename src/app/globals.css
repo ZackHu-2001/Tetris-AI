@@ -45,3 +45,8 @@ body {
     font-size: 1rem;
   }
 }
+
+.title {
+  font-size: 4rem;
+  font-weight: bold;
+}

@@ -12,6 +12,7 @@ const Setting:React.FC<SettingProps> = () => {
         setModal('mainMenu')
     }
     return <div className='flex flex-col justify-center items-center h-full'>
+        <div className='title'>Setting</div>
         <MenuButton text='Done' onClick={handleDone}></MenuButton>
     </div>
 }
