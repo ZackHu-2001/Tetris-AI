@@ -8,7 +8,7 @@ type PauseProps = {};
 
 const Pause: React.FC<PauseProps> = () => {
     const { setStatus, setModal, setMode } = useGameState();
-    const { setIsNewGame, append, setFallingTetromino, initializeGameBoard } = useGameBoard();
+    const { initializeTetrominoQueue, setIsNewGame, setFallingTetromino, initializeGameBoard } = useGameBoard();
     const handleReturn = () => {
         setStatus("playing")
         setModal(null)
@@ -23,9 +23,7 @@ const Pause: React.FC<PauseProps> = () => {
 
         // reset game board
         // initialize nextTetrominoQueue
-        for (let i = 0; i < 6; i++) {
-            append(getRandomTetromino());
-        }
+        initializeTetrominoQueue();
 
         // initialize game board
         initializeGameBoard();

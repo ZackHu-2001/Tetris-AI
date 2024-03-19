@@ -8,14 +8,12 @@ import { CiSettings } from "react-icons/ci";
 type MainMenuProps = {};
 
 const MainMenu:React.FC<MainMenuProps> = () => {
-    const { append, pop, setFallingTetromino, setFallingShape, addTetromino, initializeGameBoard } = useGameBoard();
+    const { initializeTetrominoQueue, pop, setFallingTetromino, setFallingShape, addTetromino, initializeGameBoard } = useGameBoard();
     const { gameState, setStatus, setMode, setModal } = useGameState();
 
     const handleStart = () => {
         // initialize nextTetrominoQueue
-        for (let i = 0; i < 6; i++) {
-            append(getRandomTetromino());
-        }
+        initializeTetrominoQueue();
 
         // initialize game board
         initializeGameBoard();
