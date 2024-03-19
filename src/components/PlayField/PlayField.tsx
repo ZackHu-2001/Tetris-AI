@@ -5,14 +5,13 @@ import { useGameState } from '../GameState';
 type PlayFieldProps = {};
 
 const PlayField: React.FC<PlayFieldProps> = () => {
-    const { board, moveDown, moveLeft, moveRight, drop } = useGameBoard()
+    const { board, moveDown, moveLeft, moveRight, drop, clockWiseRotate } = useGameBoard()
     const { setStatus, setModal } = useGameState();
     const rowNum = 20;
     const colNum = 10;
 
-    const initializeGame = () => {
-
-    };
+    const initializeGame = () => {};
+    
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             event.preventDefault();
@@ -33,7 +32,15 @@ const PlayField: React.FC<PlayFieldProps> = () => {
                     // TODO show the pause menu
                     setStatus('paused');
                     setModal('pauseMenu');
-
+                    break;
+                case 'z':
+                    console.log("z pressed")
+                    clockWiseRotate();
+                    break;
+                    
+                case 'x':
+                    console.log("c pressed")
+                    clockWiseRotate();
                     break;
             }
             console.log('key pressed', event.key);
@@ -54,8 +61,8 @@ const PlayField: React.FC<PlayFieldProps> = () => {
                     {Array.from({ length: colNum }).map((_, i) => {
                         return (
                             <div className=' h-full bg-black' key={rowIndex * 10 + i} 
-                            style={{ width: '10%', border: '1px solid green', boxSizing: 'border-box', backgroundColor: (row & (1 << i)) ? "red" : ""}}>
-                                {row & (1 << i)}
+                            style={{ width: '10%', border: '', boxSizing: 'border-box', backgroundColor: (row & (1 << i)) ? "red" : ""}}>
+                                {/* {row & (1 << i)} */}
                             </div>
                         )
 

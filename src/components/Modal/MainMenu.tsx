@@ -8,12 +8,12 @@ import { CiSettings } from "react-icons/ci";
 type MainMenuProps = {};
 
 const MainMenu:React.FC<MainMenuProps> = () => {
-    const { append, pop, setFallingTetromino, addTetromino, initializeGameBoard } = useGameBoard();
+    const { append, pop, setFallingTetromino, setFallingShape, addTetromino, initializeGameBoard } = useGameBoard();
     const { gameState, setStatus, setMode, setModal } = useGameState();
 
     const handleStart = () => {
         // initialize nextTetrominoQueue
-        for (let i = 0; i < 7; i++) {
+        for (let i = 0; i < 6; i++) {
             append(getRandomTetromino());
         }
 
@@ -21,9 +21,10 @@ const MainMenu:React.FC<MainMenuProps> = () => {
         initializeGameBoard();
 
         // initialize fallingTetromino
-        setFallingTetromino(getRandomTetromino());
-
-        // initialize timer
+        const NextTetromino = getRandomTetromino();
+        setFallingTetromino(NextTetromino);
+        setFallingShape(NextTetromino);
+        
         
         // change global game state
         setStatus('playing');

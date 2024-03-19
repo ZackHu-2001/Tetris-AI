@@ -19,6 +19,12 @@ interface gameBoardInterface {
     clockWiseRotate: () => void;
     anticlockWiseRotate: () => void;
 
+    fallingShape: Tetromino;
+    setFallingShape: (tetromino: Tetromino) => void;
+
+    offSet: number[];
+    setOffSet: (offSet: number[]) => void;
+
     board: GameBoard;
     updateBoard: () => void;
 
@@ -107,7 +113,12 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     fallingTetromino: [],
 
     setFallingTetromino: (tetromino: GameBoard) => {
-        const tetrominoCopy: GameBoard = [...tetromino];
+        const tetrominoCopy: GameBoard = [];
+        for (const row of tetromino) {
+            if (row !== 0) {
+                tetrominoCopy.push(row);
+            }
+        }
         for (let i = 0; i < tetromino.length; i++) {
             tetrominoCopy[i] = tetrominoCopy[i] << 3;
         }
@@ -129,6 +140,8 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             });
 
             if (canMove) {
+                get().setOffSet([get().offSet[0] - 1, get().offSet[1]])
+                console.log(get().offSet)
                 const newTetromino = state.fallingTetromino.map((row) => {
                     row = row >> 1;
                     return row;
@@ -151,6 +164,9 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                 }
             });
             if (canMove) {
+                get().setOffSet([get().offSet[0] + 1, get().offSet[1]])
+                console.log(get().offSet)
+
                 const newTetromino = state.fallingTetromino.map((row) => {
                     row = row << 1;
                     return row;
@@ -180,13 +196,23 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                 return true;
             }
 
+            // console.log("can move down: ", canMoveDown())
+
+            if (!canMoveDown()) {
+                console.log("can't move down")
+                console.log(state.fallingTetromino, state.gameBoard)
+            }
             // annonymous function to determine if can move down
             if (canMoveDown()) {
+                get().setOffSet([get().offSet[0], get().offSet[1] + 1])
 
                 return { fallingTetromino: [0].concat(state.fallingTetromino.slice(0, -1)) };
 
             } else {
                 // TODO handle attach
+
+                // reset offset
+                get().setOffSet([3, 0])
 
                 // add current falling tetromino to the game board
                 get().addTetromino(get().fallingTetromino);
@@ -204,6 +230,10 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         set((state) => {
             return { fallingTetromino: getDropPosition(state) };
         });
+        
+        // reset offset
+        get().setOffSet([3, 0])
+
         // add current falling tetromino to the game board
         get().addTetromino(get().fallingTetromino);
 
@@ -213,29 +243,41 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     },
 
     clockWiseRotate: () => {
-        set((state) => {
-            const newTetromino = state.fallingTetromino.map((row) => {
-                if (!(row & (2 ** 10))) {
-                    row = row << 1;
-                }
-                return row;
-            });
-            return { fallingTetromino: newTetromino };
-        });
+        
+        const rotatedShape = rotate(get().fallingShape, 1)
+        set({ fallingShape: rotatedShape})
+
+        const destination = moveTo(get().fallingShape, get(), get().offSet); 
+        set({ fallingTetromino: destination })
         get().updateBoard();
     },
 
     anticlockWiseRotate: () => {
-        set((state) => {
-            const newTetromino = state.fallingTetromino.map((row) => {
-                if (!(row & (2 ** 10))) {
-                    row = row << 1;
-                }
-                return row;
-            });
-            return { fallingTetromino: newTetromino };
-        });
+        const rotatedShape = rotate(get().fallingShape, -1)
+        set({ fallingShape: rotatedShape})
+
+        const destination = moveTo(get().fallingShape, get(), get().offSet); 
+        set({ fallingTetromino: destination })
         get().updateBoard();
+    },
+
+    fallingShape: [] as Tetromino,
+    setFallingShape: (tetromino: Tetromino) => {
+        for (let i = 0; i < 3; i++) {
+            get().setOffSet([get().offSet[0] + 1, get().offSet[1]])
+        }
+        let i = 0;
+        while (tetromino[i] === 0) {
+            i++;
+            get().setOffSet([get().offSet[0], get().offSet[1] - 1])
+        }
+
+        set({ fallingShape: tetromino });
+    },
+
+    offSet: [0, 0] as number[],
+    setOffSet: (offSet: number[]) => {
+        set({ offSet: offSet });
     },
 
     nextTetrominoQueue: [] as Tetromino[],
@@ -300,14 +342,60 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     }
 }));
 
+function rotate(tetromino: number[], direction: number) {
+    const n = tetromino.length;
+    const newTetromino = Array(n).fill(0);
+    if (direction > 0) {
+        for (let i = 0; i < n; i++) {
+            for (let j = 0; j < n; j++) {
+                const x = j;
+                const y = n - 1 - i;
+                newTetromino[x] |= (tetromino[i] >> j & 1) << y;
+            }
+        }
+    } else {
+        for (let i = 0; i < n; i++) {
+            for (let j = 0; j < n; j++) {
+                const x = n - 1 - j;
+                const y = i;
+                newTetromino[x] |= (tetromino[i] >> j & 1) << y;
+            }
+        }
+    }
+    return newTetromino;
+}
+
+function moveTo(tetromino: Tetromino, state: gameBoardInterface, offSet: number[]): Tetromino {
+    var tetrominoCopy = tetromino.map((row) => row << offSet[0]);
+    for (let i=0; i<offSet[1]; i++) {
+        tetrominoCopy = [0].concat(tetrominoCopy);
+    }
+    const sufixZero = 20 - tetrominoCopy.length;
+    for (let i=0; i<(sufixZero); i++) {
+        tetrominoCopy = tetrominoCopy.concat([0]);
+    }
+
+    return tetrominoCopy;
+}
+
+// export const tetrominos: Record<string, Tetromino> = {
+//     I: [15],
+//     J: [4, 7],
+//     L: [1, 7],
+//     O: [3, 3],
+//     S: [3, 6],
+//     T: [2, 7],
+//     Z: [6, 3],
+// };
+
 export const tetrominos: Record<string, Tetromino> = {
-    I: [15],
-    J: [4, 7],
-    L: [1, 7],
+    I: [0, 15, 0, 0],
+    J: [4, 7, 0],
+    L: [1, 7, 0],
     O: [3, 3],
-    S: [3, 6],
-    T: [2, 7],
-    Z: [6, 3],
+    S: [0, 3, 6],
+    T: [2, 7, 0],
+    Z: [0, 6, 3],
 };
 
 export const getRandomTetromino = () => {
