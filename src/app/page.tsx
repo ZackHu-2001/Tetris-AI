@@ -40,26 +40,30 @@ export default function Home() {
         document.documentElement.style.setProperty('--buttonHeight', dimensions.width * 0.15 + 'px');
         document.documentElement.style.setProperty('--playFieldWidth', dimensions.width * 1 + 'px');
         document.documentElement.style.setProperty('--playFieldHeight', dimensions.width * 2 + 'px');
+        document.documentElement.style.setProperty('font-size', dimensions.width * 0.01 + 'px');
       } else {
         document.documentElement.style.setProperty('--bgWidth', dimensions.width * (4 / 3) * 0.7 + 'px');
         document.documentElement.style.setProperty('--buttonWidth', dimensions.width * 0.42 + 'px');
         document.documentElement.style.setProperty('--buttonHeight', dimensions.width * 0.105 + 'px');
         document.documentElement.style.setProperty('--playFieldWidth', dimensions.width * 0.7 + 'px');
         document.documentElement.style.setProperty('--playFieldHeight', dimensions.width * 1.4 + 'px');
+        document.documentElement.style.setProperty('font-size', dimensions.width * 0.007 + 'px');
       }
     } else {
       if (dimensions.width <= 600) {
         document.documentElement.style.setProperty('--bgWidth', dimensions.height * (2 / 3) + 'px');
-        document.documentElement.style.setProperty('--buttonWidth', dimensions.width * 0.3 + 'px');
-        document.documentElement.style.setProperty('--buttonHeight', dimensions.width * 0.075 + 'px');
+        document.documentElement.style.setProperty('--buttonWidth', dimensions.height * 0.3 + 'px');
+        document.documentElement.style.setProperty('--buttonHeight', dimensions.height * 0.075 + 'px');
         document.documentElement.style.setProperty('--playFieldWidth', dimensions.height * 0.5 + 'px');
         document.documentElement.style.setProperty('--playFieldHeight', dimensions.height + 'px');
+        document.documentElement.style.setProperty('font-size', dimensions.height * 0.005 + 'px');
       } else {
         document.documentElement.style.setProperty('--bgWidth', dimensions.height * (4 / 3) * 0.45 + 'px');
-        document.documentElement.style.setProperty('--buttonWidth', dimensions.width * 0.27 + 'px');
-        document.documentElement.style.setProperty('--buttonHeight', dimensions.width * 0.0675 + 'px');
+        document.documentElement.style.setProperty('--buttonWidth', dimensions.height * 0.27 + 'px');
+        document.documentElement.style.setProperty('--buttonHeight', dimensions.height * 0.0675 + 'px');
         document.documentElement.style.setProperty('--playFieldWidth', dimensions.height * 0.45 + 'px');
         document.documentElement.style.setProperty('--playFieldHeight', dimensions.height * 0.9 + 'px');
+        document.documentElement.style.setProperty('font-size', dimensions.height * 0.0045 + 'px');
       }
     }
   }, [dimensions.width, dimensions.height])
