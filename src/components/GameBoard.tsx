@@ -161,7 +161,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
             if (canMove) {
                 get().setOffSet([get().offSet[0] - 1, get().offSet[1]])
-                console.log(get().offSet)
+                // console.log(get().offSet)
                 const newTetromino = state.fallingTetromino.map((row) => {
                     row = row >> 1;
                     return row;
@@ -185,7 +185,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             });
             if (canMove) {
                 get().setOffSet([get().offSet[0] + 1, get().offSet[1]])
-                console.log(get().offSet)
+                // console.log(get().offSet)
 
                 const newTetromino = state.fallingTetromino.map((row) => {
                     row = row << 1;
@@ -264,10 +264,11 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
     clockWiseRotate: () => {
 
-        const rotatedShape = rotate(get().fallingShape, 1)
+        const rotatedShape = rotate(get().fallingShape, 1)   
         set({ fallingShape: rotatedShape })
 
         const destination = moveTo(get().fallingShape, get(), get().offSet);
+        // console.log(destination)
         set({ fallingTetromino: destination })
         get().updateBoard();
     },
@@ -277,6 +278,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         set({ fallingShape: rotatedShape })
 
         const destination = moveTo(get().fallingShape, get(), get().offSet);
+        // console.log(destination)
         set({ fallingTetromino: destination })
         get().updateBoard();
     },
@@ -399,10 +401,68 @@ function rotate(tetromino: number[], direction: number) {
 }
 
 function moveTo(tetromino: Tetromino, state: gameBoardInterface, offSet: number[]): Tetromino {
-    var tetrominoCopy = tetromino.map((row) => row << offSet[0]);
+
+    var tetrominoCopy: Tetromino = tetromino;
+    // var tetrominoCopy = tetromino.map((row) => row << offSet[0]);
+
+    if (offSet[0] > 0) {
+        for (let i=0; i<offSet[0]; i++) {
+            let canMove = true;
+            for (let row of tetrominoCopy) {
+                if (row >= 512) {
+                    canMove = false;
+                    break;
+                }
+            }
+            console.log(canMove)
+            if (!canMove) {
+                state.setOffSet([i, state.offSet[1]])
+                break;
+            }
+            tetrominoCopy = tetrominoCopy.map((row) => row << 1)
+        }
+    } else {
+        for (let i=0; i>offSet[0]; i--) {
+            let canMove = true;
+            for (let row of tetrominoCopy) {
+                if (row & 1) {
+                    canMove = false;
+                    break;
+                }
+            }
+            console.log(canMove)
+            if (!canMove) {
+                state.setOffSet([i, state.offSet[1]])
+                break;
+            }
+            tetrominoCopy = tetrominoCopy.map((row) => row >> 1)
+        }
+    }
+
     for (let i = 0; i < offSet[1]; i++) {
         tetrominoCopy = [0].concat(tetrominoCopy);
     }
+
+    // remove sufix zeros
+    if (tetrominoCopy.length > 20) {
+        var tmp = tetrominoCopy.pop()
+        while (tmp === 0) {
+            tmp = tetrominoCopy.pop()
+        }
+
+        if (tmp !== undefined) {
+            tetrominoCopy.push(tmp)
+        }
+    }
+    console.log(tetrominoCopy)
+
+
+    // if after removed sufix zeros still length greater than 20 then do something extra
+    if (tetrominoCopy.length > 20) {
+        var extraLength = tetrominoCopy.length - 20;
+        tetrominoCopy = tetrominoCopy.slice(extraLength)
+    }
+
     const sufixZero = 20 - tetrominoCopy.length;
     for (let i = 0; i < (sufixZero); i++) {
         tetrominoCopy = tetrominoCopy.concat([0]);
