@@ -6,24 +6,34 @@ import { useGameBoard } from '@/components/GameBoard'; // Ensure correct path
 
 
 // Annotating the `filled` prop type directly in the parameter list
-const TetrominoBlock = ({filled, color}: {filled: boolean, color:string}) => (
-    <div className={`w-4 h-4 ${filled ? `${color} border border-gray-200` : 'bg-transparent'} box-border`}></div>
+const TetrominoBlock = ({ filled, color }: { filled: boolean, color: string }) => (
+    <div className={`w-16 h-16 ${filled ? `${color} border border-gray-200` : 'bg-transparent'} box-border`}></div>
 );
 
-
 const NextTetromino = ({ tetromino }: { tetromino: number[] }) => {
-    const cols = 4; // Assuming a standard width for tetrominos
     const tetroColor = mapColor(tetromino);
+    const cols = 4; // Assuming a standard width for tetrominos
+    var tetrominoCopy = [];
+    for (let i = 0; i < tetromino.length; i++) {
+        if (tetromino[i] !== 0) {
+            tetrominoCopy.push(tetromino[i]);
+        }
+    }
+    if (tetrominoCopy[0] == 15) {
+        tetrominoCopy = [0].concat(tetrominoCopy);
+    }
+
+
     return (
         <div className='flex flex-col'>
-            {tetromino.map((row, rowIndex) => (
+            {tetrominoCopy.map((row, rowIndex) => (
                 <div key={rowIndex} className='flex'>
                     {Array.from({ length: cols }).map((_, colIndex) => {
                         const isFilled = !!(row & (1 << (cols - 1 - colIndex)));
                         return (
-                            <TetrominoBlock key={colIndex} filled={isFilled} color={tetroColor}/>
-                            )
-                         // Return null for empty cells, so they don't get rendered
+                            <TetrominoBlock key={colIndex} filled={isFilled} color={tetroColor} />
+                        )
+                        // Return null for empty cells, so they don't get rendered
                     })}
                 </div>
             ))}
@@ -32,35 +42,37 @@ const NextTetromino = ({ tetromino }: { tetromino: number[] }) => {
 };
 
 const NextPanel = () => {
-    const { nextTetrominoQueue } = useGameBoard(); 
+    const { nextTetrominoQueue } = useGameBoard();
 
     return (
-        <div style={{width: '25%', fontSize: '5rem'}} className='flex flex-col items-center p-4'>
-            <div style={{fontWeight: 'bold'}}>NEXT</div>
-            {nextTetrominoQueue.map((tetromino, index) => (
-                // Add a margin class to the div wrapping the NextTetromino component
-                <div key={index} className='mb-8'> {/* Adjust the margin-bottom (mb-*) value as needed */}
-                    <NextTetromino tetromino={tetromino} />
-                </div>
-            ))}
+        <div style={{ width: '25%', fontSize: '5rem' }} className='flex flex-col items-center p-4'>
+            <div style={{ fontWeight: 'bold' }}>NEXT</div>
+
+            <div className='h-full py-[10rem] flex flex-col justify-between'>
+
+                {nextTetrominoQueue.map((tetromino, index) => (
+                    index <= 6 ? <NextTetromino tetromino={tetromino} /> : null
+                ))}
+            </div>
         </div>
     );
 };
+
 function mapColor(arr: number[]) {
-    switch (arr.join(',')) {
-        case '15':
+    switch (arr.join('')) {
+        case '01500':
             return 'bg-cyan-500';
-        case '4,7':
+        case '470':
             return 'bg-blue-500';
-        case '2,7':
+        case '270':
             return 'bg-purple-500';
-        case '1,7':
+        case '170':
             return 'bg-orange-500';
-        case '3,3':
+        case '33':
             return 'bg-yellow-500';
-        case '3,6':
+        case '036':
             return 'bg-green-500';
-        case '6,3':
+        case '063':
             return 'bg-red-500';
         default:
             return '';
