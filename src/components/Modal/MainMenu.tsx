@@ -19,7 +19,6 @@ const MainMenu:React.FC<MainMenuProps> = () => {
         // initialize fallingTetromino
         const NextTetromino = pop();
         setFallingTetromino(NextTetromino);
-        setFallingShape(NextTetromino);
         
         updateBoard();
 
