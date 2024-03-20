@@ -72,16 +72,16 @@ export default function Home() {
   return (
     <div className="flex justify-center">
       <div
-        style={{ width: 'var(--bgWidth, 100px)' }}
-        className="dark:bg-slate-300 bg-slate-700 h-[100vh] flex flex-col justify-center">
+        style={{ width: 'var(--bgWidth, 100px)', backgroundColor: 'rgba(0,0,0, 0.5)' }}
+        className=" h-[100vh] flex flex-col justify-center">
 
         <div style={{ width: 'var(--bgWidth)', height: 'var(--playFieldHeight)' }}
         className="flex flex-row">
           <StatusPanel />
           <div
           id="playField"
-          style={{ width: 'var(--playFieldWidth)', height: 'var(--playFieldHeight)', borderWidth: '0.5vh' }} 
-          className="w-full relative ">
+          style={{ width: 'var(--playFieldWidth)', height: 'var(--playFieldHeight)', borderWidth: '0.2vh', boxShadow: '0 0 1rem 0rem rgba(255,255,255)' }} 
+          className="w-full relative bg-black">
             <BasicModal />
             <PlayField />
           </div>
