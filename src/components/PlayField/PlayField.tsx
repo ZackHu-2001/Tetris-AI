@@ -1,12 +1,10 @@
 import React, { useEffect } from 'react';
 import { useGameBoard } from '../GameBoard';
-import { useGameState } from '../GameState';
 
 type PlayFieldProps = {};
 
 const PlayField: React.FC<PlayFieldProps> = () => {
-    const { board, moveDown, moveLeft, moveRight, drop, clockWiseRotate } = useGameBoard()
-    const { setStatus, setModal } = useGameState();
+    const { setStatus, setModal, board, moveDown, moveLeft, moveRight, drop, clockWiseRotate } = useGameBoard()
     const rowNum = 20;
     const colNum = 10;
 

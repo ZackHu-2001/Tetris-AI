@@ -1,14 +1,27 @@
 import { create } from "zustand";
 
+export type GameState = {
+    status: 'paused' | 'playing' | 'gameOver' | null,
+    mode: 'sprint' | 'competition' | 'endless' | null,
+    modal: 'mainMenu' | 'pauseMenu' | 'control' | 'setting' | 'gameOver' | null,
+    winOrLose: 'win' | 'lose' | null,
+}
 export type Tetromino = number[];
 export type GameBoard = number[];
 export const rowNum = 20;
 export const colNum = 10;
 
 interface gameBoardInterface {
+    gameState: GameState,
+    setStatus: (status: GameState['status']) => void;
+    setMode: (mode: GameState['mode']) => void;
+    setModal: (modal: GameState['modal']) => void;
+    setWinOrLose: (winOrLose: GameState['winOrLose']) => void;
+
     gameBoard: GameBoard;
     addTetromino: (tetromino: Tetromino) => void;
     initializeGameBoard: () => void;
+
 
     fallingTetromino: GameBoard;
     setFallingTetromino: (tetromino: Tetromino) => void;
@@ -29,7 +42,8 @@ interface gameBoardInterface {
     updateBoard: () => void;
 
     nextTetrominoQueue: Tetromino[];
-    append: (mino: Tetromino) => void;
+    initializeTetrominoQueue: () => void;
+    addPack: () => void;
     pop: () => Tetromino;
 
     score: number;
@@ -77,6 +91,12 @@ const getDropPosition = (state: gameBoardInterface): Tetromino => {
 }
 
 export const useGameBoard = create<gameBoardInterface>((set, get) => ({
+    gameState: { status: null, mode: null, modal: 'mainMenu', winOrLose: null},
+    setStatus: (status: GameState['status']) => set((state) => ({ gameState: { ...state.gameState, status } })),
+    setMode: (mode: GameState['mode']) => set((state) => ({ gameState: { ...state.gameState, mode } })),
+    setModal: (modal: GameState['modal']) => set((state) => ({ gameState: { ...state.gameState, modal } })),
+    setWinOrLose: (winOrLose: GameState['winOrLose']) => set((state) => ({ gameState: { ...state.gameState, winOrLose } })),
+
     board: [],
 
     updateBoard: () => {
@@ -107,7 +127,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         set((state) => {
             return { gameBoard: Array(rowNum).fill(0) };
         });
-        get().updateBoard();
+        // get().updateBoard();
     },
 
     fallingTetromino: [],
@@ -196,12 +216,6 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                 return true;
             }
 
-            // console.log("can move down: ", canMoveDown())
-
-            if (!canMoveDown()) {
-                console.log("can't move down")
-                console.log(state.fallingTetromino, state.gameBoard)
-            }
             // annonymous function to determine if can move down
             if (canMoveDown()) {
                 get().setOffSet([get().offSet[0], get().offSet[1] + 1])
@@ -217,6 +231,9 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                 // add current falling tetromino to the game board
                 get().addTetromino(get().fallingTetromino);
 
+                // check if have any line to clear
+                get().checkAndClearLines();
+
                 // pop the next element
                 get().setFallingTetromino(get().pop())
                 return {}
@@ -230,12 +247,15 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         set((state) => {
             return { fallingTetromino: getDropPosition(state) };
         });
-        
+
         // reset offset
         get().setOffSet([3, 0])
 
         // add current falling tetromino to the game board
         get().addTetromino(get().fallingTetromino);
+        
+        // check if have any line to clear
+        get().checkAndClearLines();
 
         // pop the next element
         get().setFallingTetromino(get().pop())
@@ -243,20 +263,20 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     },
 
     clockWiseRotate: () => {
-        
-        const rotatedShape = rotate(get().fallingShape, 1)
-        set({ fallingShape: rotatedShape})
 
-        const destination = moveTo(get().fallingShape, get(), get().offSet); 
+        const rotatedShape = rotate(get().fallingShape, 1)
+        set({ fallingShape: rotatedShape })
+
+        const destination = moveTo(get().fallingShape, get(), get().offSet);
         set({ fallingTetromino: destination })
         get().updateBoard();
     },
 
     anticlockWiseRotate: () => {
         const rotatedShape = rotate(get().fallingShape, -1)
-        set({ fallingShape: rotatedShape})
+        set({ fallingShape: rotatedShape })
 
-        const destination = moveTo(get().fallingShape, get(), get().offSet); 
+        const destination = moveTo(get().fallingShape, get(), get().offSet);
         set({ fallingTetromino: destination })
         get().updateBoard();
     },
@@ -281,59 +301,72 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     },
 
     nextTetrominoQueue: [] as Tetromino[],
+    initializeTetrominoQueue: () => {
+        set({ nextTetrominoQueue: shufflePack(pack) });
+    },
 
-    append: (mino: Tetromino) =>
-        set((state) => ({
-            nextTetrominoQueue: [...state.nextTetrominoQueue, mino],
-        })),
+    addPack: () => {
+        set((state) => {
+            const newPack = shufflePack(pack);
+            return { nextTetrominoQueue: state.nextTetrominoQueue.concat(newPack) };
+        });
+    },
 
     pop: () => {
-        if (get().nextTetrominoQueue.length === 0) {
-            return [-1];
-        } else {
-            const popedValue = get().nextTetrominoQueue[0];
-            get().nextTetrominoQueue.slice(1);
-            set((state) => ({
-                nextTetrominoQueue: state.nextTetrominoQueue,
-            }));
-            return popedValue;
+        // if remaining tetromino is less than 6, add a new pack
+        if (get().nextTetrominoQueue.length <= 6) {
+            get().addPack();
         }
+
+        const popedValue = get().nextTetrominoQueue[0];
+        get().setFallingShape(popedValue);
+        get().setOffSet([3, 0]);
+        set((state) => ({
+            nextTetrominoQueue: get().nextTetrominoQueue.slice(1),
+        }));
+        return popedValue;
     },
 
     score: 0,
     lines: rowNum,
     addScore: (linesCleared) => {
+        const scoreArray = [0, 40, 100, 300, 1200];
         set((state) => {
             // Update the score based on the lines cleared, you can adjust the scoring logic
-            const scoreToAdd = linesCleared * 100;
+            const scoreToAdd = scoreArray[linesCleared];
             const newScore = state.score + scoreToAdd;
             const newLines = state.lines - linesCleared;
             return { score: newScore, lines: newLines >= 0 ? newLines : 0 };
         });
+
+        // game over check
+        if (get().lines === 0) {
+            get().setStatus('gameOver');
+            get().setModal('gameOver');
+            get().setWinOrLose('win');
+        }
     },
 
     checkAndClearLines: () => {
-        // TODO: Implement the logic to check and clear lines
-        set((state) => {
-            let linesCleared = 0;
-            const fullLine = (1 << colNum) - 1;
-            const newGameBoard = state.gameBoard.filter((row) => {
-                const isRowFull = row === fullLine;
-                if (isRowFull) linesCleared++;
-                return !isRowFull;
-            });
 
-            const emptyLine = 0;
-            for (let i = 0; i < linesCleared; i++) {
-                newGameBoard.unshift(emptyLine);
+        // clear line first
+        var cnt = 0;
+        for (let i = 0; i < rowNum; i++) {
+            if (get().gameBoard[i] === 1023) {
+                get().gameBoard.splice(i, 1);
+                get().gameBoard.unshift(0);
+                cnt += 1;
             }
-            get().addScore(linesCleared);
+        }
 
-            return {
-                gameBoard: newGameBoard,
-                lines: state.lines - linesCleared,
-            };
-        });
+        get().addScore(cnt);
+
+        // check if the top line is full
+        if (get().gameBoard[0] !== 0 || get().gameBoard[1] !== 0) {
+            get().setStatus('gameOver');
+            get().setModal('gameOver');
+            get().setWinOrLose('lose');
+        }
     },
 
     isNewGame: false,
@@ -367,26 +400,16 @@ function rotate(tetromino: number[], direction: number) {
 
 function moveTo(tetromino: Tetromino, state: gameBoardInterface, offSet: number[]): Tetromino {
     var tetrominoCopy = tetromino.map((row) => row << offSet[0]);
-    for (let i=0; i<offSet[1]; i++) {
+    for (let i = 0; i < offSet[1]; i++) {
         tetrominoCopy = [0].concat(tetrominoCopy);
     }
     const sufixZero = 20 - tetrominoCopy.length;
-    for (let i=0; i<(sufixZero); i++) {
+    for (let i = 0; i < (sufixZero); i++) {
         tetrominoCopy = tetrominoCopy.concat([0]);
     }
 
     return tetrominoCopy;
 }
-
-// export const tetrominos: Record<string, Tetromino> = {
-//     I: [15],
-//     J: [4, 7],
-//     L: [1, 7],
-//     O: [3, 3],
-//     S: [3, 6],
-//     T: [2, 7],
-//     Z: [6, 3],
-// };
 
 export const tetrominos: Record<string, Tetromino> = {
     I: [0, 15, 0, 0],
@@ -398,9 +421,13 @@ export const tetrominos: Record<string, Tetromino> = {
     Z: [0, 6, 3],
 };
 
-export const getRandomTetromino = () => {
-    const tetrominosKey = Object.keys(tetrominos);
-    const randomIndex = Math.floor(Math.random() * tetrominosKey.length);
-    const randomTetromino = tetrominos[tetrominosKey[randomIndex]];
-    return randomTetromino;
-};
+const pack = [[0, 15, 0, 0], [4, 7, 0], [1, 7, 0], [3, 3], [0, 3, 6], [2, 7, 0], [0, 6, 3],]
+const shufflePack = (pack: number[][]) => {
+    for (let i = pack.length - 1; i > 0; i--) {
+        // Generate a random index
+        const j = Math.floor(Math.random() * (i + 1));
+        // Swap the current element with the randomly chosen one
+        [pack[i], pack[j]] = [pack[j], pack[i]];
+    }
+    return pack;
+}

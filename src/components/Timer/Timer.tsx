@@ -1,13 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useGameState } from '../GameState';
 import { useGameBoard } from '../GameBoard';
-
 
 type TimerProps = {};
 
 const Timer: React.FC<TimerProps> = () => {
-    const { gameState } = useGameState();
-    const { moveDown, isNewGame, setIsNewGame } = useGameBoard();
+    const { gameState, moveDown, isNewGame, setIsNewGame } = useGameBoard();
 
     const [time, setTime] = useState(0);
 
@@ -47,8 +44,8 @@ const Timer: React.FC<TimerProps> = () => {
             }
         }
 
-        if (gameState.status == 'gameover') {
-            setTime(0);
+        if (gameState.status == 'gameOver') {
+            setTime(0); 
         }
 
         return () => {
@@ -58,7 +55,7 @@ const Timer: React.FC<TimerProps> = () => {
     }, [gameState, setTime, moveDown]);
 
 
-    return <div className='w-full flex '>{formatTime(time).split('').map((char: string, index: number) => {
+    return <div style={{paddingLeft: '2rem', paddingRight: '2rem'}} className='w-full flex '>{formatTime(time).split('').map((char: string, index: number) => {
         return <div key={index} className='timer-char'>{char}</div>
     })}</div>
 }

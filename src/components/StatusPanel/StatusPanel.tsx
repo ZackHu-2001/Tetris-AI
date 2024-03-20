@@ -6,7 +6,8 @@ import { useGameBoard } from '../GameBoard';
 type StatusPanelProps = {};
 
 const StatusPanel:React.FC<StatusPanelProps> = () => {
-    const { fallingTetromino, gameBoard, board } = useGameBoard();
+
+    const { gameState, fallingTetromino, gameBoard, board } = useGameBoard();
     const { score, lines } = useGameBoard(state => ({ score: state.score, lines: state.lines }));
     return (
         <div style={{width: '25%', fontSize: '5rem'}} className=' flex flex-col items-center '>
@@ -17,7 +18,11 @@ const StatusPanel:React.FC<StatusPanelProps> = () => {
             <div>{fallingTetromino}</div>
             <div>{gameBoard}</div>
             <div>{board}</div>
-
+            <div>{gameState.status}</div>
+            <div>{gameState.modal}</div>
+            <div>{gameState.mode}</div>
+            <div>{gameState.winOrLose}</div>
+        
         </div>
     )
 }

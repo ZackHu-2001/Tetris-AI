@@ -1,13 +1,11 @@
 import React from 'react';
 import MenuButton from '../MenuButton/MenuButton';
-import { useGameState } from '../GameState';
+import { useGameBoard } from '../GameBoard';
 
-type SettingProps = {
-    
-};
+type SettingProps = {};
 
 const Setting:React.FC<SettingProps> = () => {
-    const { setModal } = useGameState();
+    const { setModal } = useGameBoard();
     const handleDone = () => {
         setModal('mainMenu')
     }
