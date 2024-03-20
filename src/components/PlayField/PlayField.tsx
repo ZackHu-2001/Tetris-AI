@@ -4,7 +4,7 @@ import { useGameBoard } from '../GameBoard';
 type PlayFieldProps = {};
 
 const PlayField: React.FC<PlayFieldProps> = () => {
-    const { setStatus, setModal, board, moveDown, moveLeft, moveRight, drop, clockWiseRotate } = useGameBoard()
+    const { setStatus, setModal, board, moveDown, moveLeft, moveRight, drop, clockWiseRotate, anticlockWiseRotate } = useGameBoard()
     const rowNum = 20;
     const colNum = 10;
 
@@ -31,17 +31,16 @@ const PlayField: React.FC<PlayFieldProps> = () => {
                     setStatus('paused');
                     setModal('pauseMenu');
                     break;
-                case 'z':
+                case 'z' || 'Z':
                     console.log("z pressed")
-                    clockWiseRotate();
+                    anticlockWiseRotate();
                     break;
-                    
-                case 'x':
-                    console.log("c pressed")
+                case 'x' || 'X':
+                    console.log("x pressed")
                     clockWiseRotate();
                     break;
             }
-            console.log('key pressed', event.key);
+            // console.log('key pressed', event.key);
         }
 
         document.addEventListener('keydown', handleKeyDown);
