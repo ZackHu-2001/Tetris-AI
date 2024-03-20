@@ -14,7 +14,7 @@ const StatusPanel:React.FC<StatusPanelProps> = () => {
             <div style={{fontWeight: 'bold'}}>STATUS</div>
             <div>Score: {score}</div>
             <div>Lines: {lines}</div>
-            <Timer />
+            <Timer fontSize='5rem'/>
             <div>{fallingTetromino}</div>
             <div>{gameBoard}</div>
             <div>{board}</div>
