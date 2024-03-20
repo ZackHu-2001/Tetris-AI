@@ -1,14 +1,11 @@
 import React from 'react';
 import MenuButton from '../MenuButton/MenuButton';
-import { useGameState } from '../GameState';
 import { useGameBoard } from '../GameBoard';
-import { getRandomTetromino } from '@/components/GameBoard'
 
 type PauseProps = {};
 
 const Pause: React.FC<PauseProps> = () => {
-    const { setStatus, setModal, setMode } = useGameState();
-    const { initializeTetrominoQueue, setIsNewGame, setFallingTetromino, initializeGameBoard } = useGameBoard();
+    const { setStatus, pop, updateBoard, setFallingShape, setWinOrLose, setModal, setMode, initializeTetrominoQueue, setIsNewGame, setFallingTetromino, initializeGameBoard } = useGameBoard();
     const handleReturn = () => {
         setStatus("playing")
         setModal(null)
@@ -29,16 +26,17 @@ const Pause: React.FC<PauseProps> = () => {
         initializeGameBoard();
 
         // initialize fallingTetromino
-        setFallingTetromino(getRandomTetromino());
+        const NextTetromino = pop();
+        setFallingTetromino(NextTetromino);
+        setFallingShape(NextTetromino);
+        
+        updateBoard();
 
         // change global game state
         setStatus('playing');
         setMode('sprint');
         setModal(null);
-
-        // initialize the game board and add tetromino inside it
-        initializeGameBoard();
-        setFallingTetromino(getRandomTetromino())
+        setWinOrLose(null);
     }
 
     const handleClickMainMenu = () => {
