@@ -45,3 +45,23 @@ body {
   font-size: 4rem;
   font-weight: bold;
 }
+
+.my-6 {
+    color: #ddbea9;
+}
+.control-panel {
+    font-size: 3rem;
+    color: #ddbea9;
+}
+
+.control-panel .controls-container .control-item {
+    display: flex; /* This makes the child elements line up horizontally */
+    justify-content: space-between; /* This separates the control name and button */
+    align-items: center; /* This vertically centers the control name and button */
+    width: 100%; /* Adjust as necessary to control the width of the line */
+    margin-bottom: 10px; /* Adds a little space between each control line */
+}
+
+.control-panel .control-name {
+    margin-right: 10px; /* Adds a little space between the control name and the button */
+}

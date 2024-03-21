@@ -4,7 +4,7 @@ import { useGameBoard } from '../GameBoard';
 type PlayFieldProps = {};
 
 const PlayField: React.FC<PlayFieldProps> = () => {
-    const { setStatus, setModal, board, moveDown, moveLeft, moveRight, drop, clockWiseRotate, anticlockWiseRotate } = useGameBoard()
+    const { setStatus, setModal, board, moveDown, moveLeft, moveRight, drop, clockWiseRotate, anticlockWiseRotate, keyBindings } = useGameBoard()
     const rowNum = 20;
     const colNum = 10;
 
@@ -13,17 +13,17 @@ const PlayField: React.FC<PlayFieldProps> = () => {
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             event.preventDefault();
-            switch (event.key) {
-                case 'ArrowDown': 
+            switch (event.code) {
+                case keyBindings.moveDown: 
                     moveDown();
                     break;
-                case 'ArrowRight':
+                case keyBindings.moveRight:
                     moveRight();
                     break;
-                case 'ArrowLeft':
+                case keyBindings.moveLeft:
                     moveLeft();
                     break;
-                case ' ':
+                case keyBindings.drop:
                     drop();
                     break;
                 case 'Escape':
@@ -31,12 +31,10 @@ const PlayField: React.FC<PlayFieldProps> = () => {
                     setStatus('paused');
                     setModal('pauseMenu');
                     break;
-                case 'z' || 'Z':
-                    console.log("z pressed")
+                case keyBindings.anticlockWiseRotate:
                     anticlockWiseRotate();
                     break;
-                case 'x' || 'X':
-                    console.log("x pressed")
+                case keyBindings.clockWiseRotate:
                     clockWiseRotate();
                     break;
             }
