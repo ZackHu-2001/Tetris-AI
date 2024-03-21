@@ -326,7 +326,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     },
 
     score: 0,
-    lines: 1,
+    lines: rowNum,
     setLines: (lines: number) => {
         set((state) => {
             if (lines >= 0) {
