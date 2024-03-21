@@ -8,14 +8,25 @@ const Control: React.FC<ControlProps> = () => {
     const { setModal, setKeyBindings, keyBindings } = useGameBoard();
     const [editingControl, setEditingControl] = useState<string | null>(null);
 
+    const getDisplayNameForKey = (code: string) => {
+        switch (code) {
+            case 'ArrowLeft': return '←';
+            case 'ArrowRight': return '→';
+            case 'ArrowUp': return '↑';
+            case 'ArrowDown': return '↓';
+            case 'Space': return 'Space';
+            default:
+                return code.replace(/Key|Digit/g, '');
+        }
+    };
+
     useEffect(() => {
         const handleKeyPress = (event: KeyboardEvent) => {
             if (editingControl) {
                 event.preventDefault();
-                setKeyBindings({
-                    ...keyBindings,
-                    [editingControl]: event.code
-                });
+                const code = event.code;
+                const displayName = getDisplayNameForKey(code);
+                setKeyBindings(editingControl, code);
                 setEditingControl(null);  // Stop editing after key press
             }
         };
@@ -46,7 +57,7 @@ const Control: React.FC<ControlProps> = () => {
                             className={`button ${editingControl === control ? "button-active" : ""}`} 
                             onClick={() => startEditing(control)}
                         >
-                            {keyBindings[control] ?? 'undefined'}
+                            {key.displayName ?? 'undefined'}
                         </button>
                     </div>
                 ))}

@@ -14,16 +14,16 @@ const PlayField: React.FC<PlayFieldProps> = () => {
         const handleKeyDown = (event: KeyboardEvent) => {
             event.preventDefault();
             switch (event.code) {
-                case keyBindings.moveDown: 
+                case keyBindings.moveDown.code: 
                     moveDown();
                     break;
-                case keyBindings.moveRight:
+                case keyBindings.moveRight.code:
                     moveRight();
                     break;
-                case keyBindings.moveLeft:
+                case keyBindings.moveLeft.code:
                     moveLeft();
                     break;
-                case keyBindings.drop:
+                case keyBindings.drop.code:
                     drop();
                     break;
                 case 'Escape':
@@ -31,10 +31,10 @@ const PlayField: React.FC<PlayFieldProps> = () => {
                     setStatus('paused');
                     setModal('pauseMenu');
                     break;
-                case keyBindings.anticlockWiseRotate:
+                case keyBindings.anticlockWiseRotate.code:
                     anticlockWiseRotate();
                     break;
-                case keyBindings.clockWiseRotate:
+                case keyBindings.clockWiseRotate.code:
                     clockWiseRotate();
                     break;
             }
