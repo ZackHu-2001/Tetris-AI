@@ -46,7 +46,7 @@ const PlayField: React.FC<PlayFieldProps> = () => {
         return () => {
             document.removeEventListener('keydown', handleKeyDown);
         }
-    }, []);
+    }, [keyBindings]);
     
 
     return (
