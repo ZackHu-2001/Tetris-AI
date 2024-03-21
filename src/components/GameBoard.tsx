@@ -54,6 +54,9 @@ interface gameBoardInterface {
 
     isNewGame: boolean;
     setIsNewGame: (isNewGame: boolean) => void;
+
+    keyBindings: Record<string, string>;
+    setKeyBindings: (bindings: Record<string, string>) => void;
 }
 
 /**
@@ -381,7 +384,21 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     isNewGame: false,
     setIsNewGame: (isNewGame: boolean) => {
         set({ isNewGame });
-    }
+    },
+
+    keyBindings: {
+        moveLeft: "ArrowLeft",
+        moveRight: "ArrowRight",
+        moveDown: "ArrowDown",
+        drop: "Space",
+        clockWiseRotate: "KeyX",
+        anticlockWiseRotate: "KeyZ",
+    },
+    
+    setKeyBindings: (newBindings) =>
+        set((state) => ({
+              keyBindings: { ...state.keyBindings, ...newBindings },
+        })),
 }));
 
 function rotate(tetromino: number[], direction: number) {
