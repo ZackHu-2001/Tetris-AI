@@ -48,6 +48,7 @@ interface gameBoardInterface {
 
     score: number;
     lines: number;
+    setLines: (lines: number) => void;
     addScore: (score: number) => void;
     checkAndClearLines: () => void;
 
@@ -161,7 +162,6 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
             if (canMove) {
                 get().setOffSet([get().offSet[0] - 1, get().offSet[1]])
-                // console.log(get().offSet)
                 const newTetromino = state.fallingTetromino.map((row) => {
                     row = row >> 1;
                     return row;
@@ -185,7 +185,6 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             });
             if (canMove) {
                 get().setOffSet([get().offSet[0] + 1, get().offSet[1]])
-                // console.log(get().offSet)
 
                 const newTetromino = state.fallingTetromino.map((row) => {
                     row = row << 1;
@@ -253,7 +252,6 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
         // add current falling tetromino to the game board
         get().addTetromino(get().fallingTetromino);
-        
         // check if have any line to clear
         get().checkAndClearLines();
 
@@ -268,7 +266,6 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         set({ fallingShape: rotatedShape })
 
         const destination = moveTo(get().fallingShape, get(), get().offSet);
-        // console.log(destination)
         set({ fallingTetromino: destination })
         get().updateBoard();
     },
@@ -278,7 +275,6 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         set({ fallingShape: rotatedShape })
 
         const destination = moveTo(get().fallingShape, get(), get().offSet);
-        // console.log(destination)
         set({ fallingTetromino: destination })
         get().updateBoard();
     },
@@ -330,7 +326,18 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     },
 
     score: 0,
-    lines: rowNum,
+    lines: 1,
+    setLines: (lines: number) => {
+        set((state) => {
+            if (lines >= 0) {
+                return {lines: lines}
+            } else {
+                console.log('Error, line number can not assign to negative value!')
+                return {lines: state.lines}
+            }
+        })
+    },
+
     addScore: (linesCleared) => {
         const scoreArray = [0, 40, 100, 300, 1200];
         set((state) => {
@@ -414,7 +421,6 @@ function moveTo(tetromino: Tetromino, state: gameBoardInterface, offSet: number[
                     break;
                 }
             }
-            console.log(canMove)
             if (!canMove) {
                 state.setOffSet([i, state.offSet[1]])
                 break;
@@ -430,7 +436,6 @@ function moveTo(tetromino: Tetromino, state: gameBoardInterface, offSet: number[
                     break;
                 }
             }
-            console.log(canMove)
             if (!canMove) {
                 state.setOffSet([i, state.offSet[1]])
                 break;
@@ -454,7 +459,6 @@ function moveTo(tetromino: Tetromino, state: gameBoardInterface, offSet: number[
             tetrominoCopy.push(tmp)
         }
     }
-    console.log(tetrominoCopy)
 
 
     // if after removed sufix zeros still length greater than 20 then do something extra

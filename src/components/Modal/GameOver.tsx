@@ -1,11 +1,11 @@
 import React from 'react';
 import MenuButton from '../MenuButton/MenuButton';
-import { useGameBoard } from '../GameBoard';
+import { rowNum, useGameBoard } from '../GameBoard';
 
 type GameOverProps = {};
 
 const GameOver: React.FC<GameOverProps> = () => {
-    const { gameState, setStatus, pop, updateBoard, setFallingShape, setWinOrLose, setModal, setMode, initializeTetrominoQueue, setIsNewGame, setFallingTetromino, initializeGameBoard } = useGameBoard();
+    const { gameState, setStatus, pop, setLines, offSet, updateBoard, setFallingShape, setWinOrLose, setModal, setMode, initializeTetrominoQueue, setIsNewGame, setFallingTetromino, initializeGameBoard } = useGameBoard();
     const handleReturn = () => {
         setStatus("playing")
         setModal(null)
@@ -29,12 +29,15 @@ const GameOver: React.FC<GameOverProps> = () => {
         setFallingShape(NextTetromino);
         
         updateBoard();
+        // reset lines
+        setLines(rowNum)
 
         // change global game state
         setStatus('playing');
         setMode('sprint');
         setModal(null);
         setWinOrLose(null);
+
     }
 
     const handleClickMainMenu = () => {
@@ -42,7 +45,6 @@ const GameOver: React.FC<GameOverProps> = () => {
         setModal('mainMenu')
         // reset timer
         setIsNewGame(true)
-
     }
 
     return <div className='w-full h-full flex flex-col justify-center items-center'>
