@@ -30,9 +30,7 @@ const NextTetromino = ({ tetromino }: { tetromino: number[] }) => {
                 <div key={rowIndex} className='flex'>
                     {Array.from({ length: cols }).map((_, colIndex) => {
                         const isFilled = !!(row & (1 << (cols - 1 - colIndex)));
-                        return (
-                            <TetrominoBlock key={colIndex} filled={isFilled} color={tetroColor} />
-                        )
+                        return isFilled ? <TetrominoBlock key={colIndex} filled={isFilled} color={tetroColor} /> : null;
                         // Return null for empty cells, so they don't get rendered
                     })}
                 </div>
@@ -48,7 +46,7 @@ const NextPanel = () => {
         <div style={{ width: '25%', fontSize: '5rem' }} className='flex flex-col items-center p-4'>
             <div style={{ fontWeight: 'bold' }}>NEXT</div>
 
-            <div className='h-full py-[10rem] flex flex-col justify-between'>
+            <div className='h-full py-[10rem] flex flex-col justify-between items-center'>
 
                 {nextTetrominoQueue.map((tetromino, index) => (
                     index <= 6 ? <NextTetromino tetromino={tetromino} /> : null
