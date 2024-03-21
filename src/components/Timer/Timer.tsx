@@ -6,7 +6,7 @@ type TimerProps = {
 };
 
 const Timer: React.FC<TimerProps> = ({ fontSize = "5rem" }) => {
-  const { gameState, moveDown, isNewGame, setIsNewGame, offSet, setOffSet } = useGameBoard();
+  const { gameState, moveDown, isNewGame, setIsNewGame, setOffSet } = useGameBoard();
 
   const [time, setTime] = useState(0);
 

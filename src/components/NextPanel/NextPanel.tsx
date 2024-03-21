@@ -51,7 +51,7 @@ const NextPanel = () => {
             <div className='h-full py-[10rem] flex flex-col justify-between'>
 
                 {nextTetrominoQueue.map((tetromino, index) => (
-                    index <= 6 ? <NextTetromino tetromino={tetromino} /> : null
+                     index <= 6 ? <NextTetromino key={index} tetromino={tetromino} /> : null
                 ))}
             </div>
         </div>
