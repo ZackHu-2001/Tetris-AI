@@ -10,6 +10,10 @@ export type Tetromino = number[];
 export type GameBoard = number[];
 export const rowNum = 20;
 export const colNum = 10;
+export type KeyBinding = {
+    code: string|undefined;
+    displayName: string;
+};
 
 interface gameBoardInterface {
     gameState: GameState,
@@ -55,8 +59,8 @@ interface gameBoardInterface {
     isNewGame: boolean;
     setIsNewGame: (isNewGame: boolean) => void;
 
-    keyBindings: Record<string, string>;
-    setKeyBindings: (bindings: Record<string, string>) => void;
+    keyBindings: Record<string, KeyBinding>;
+    setKeyBindings: (control: string, code: string) => void;
 }
 
 /**
@@ -100,6 +104,44 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     setMode: (mode: GameState['mode']) => set((state) => ({ gameState: { ...state.gameState, mode } })),
     setModal: (modal: GameState['modal']) => set((state) => ({ gameState: { ...state.gameState, modal } })),
     setWinOrLose: (winOrLose: GameState['winOrLose']) => set((state) => ({ gameState: { ...state.gameState, winOrLose } })),
+    keyBindings: {
+        moveDown: { code: 'ArrowDown', displayName: '↓' },
+        moveRight: { code: 'ArrowRight', displayName: '→' },
+        moveLeft: { code: 'ArrowLeft', displayName: '←' },
+        drop: { code: 'Space', displayName: 'Space' },
+        anticlockWiseRotate: { code: 'KeyZ', displayName: 'Z' },
+        clockWiseRotate: { code: 'KeyX', displayName: 'X' },
+    },
+
+    setKeyBindings: (control, code) => {
+        const getDisplayNameForKey = (code:string) => {
+            switch (code) {
+                case 'ArrowLeft': return '←';
+                case 'ArrowRight': return '→';
+                case 'ArrowUp': return '↑';
+                case 'ArrowDown': return '↓';
+                case 'Space': return 'Space';
+                default:
+                    return code.replace(/Key|Digit/g, '');
+            }
+        };
+        set((state) => {
+            const updatedBindings = { ...state.keyBindings };
+    
+            Object.keys(updatedBindings).forEach((key) => {
+                if (updatedBindings[key].code === code && control !== key) {
+                    updatedBindings[key] = { code: undefined, displayName: 'undefined' };
+                }
+            });
+    
+            updatedBindings[control] = {
+                code: code,
+                displayName: getDisplayNameForKey(code)
+            };
+    
+            return { keyBindings: updatedBindings };
+        });
+    },
 
     board: [],
 
@@ -385,20 +427,6 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     setIsNewGame: (isNewGame: boolean) => {
         set({ isNewGame });
     },
-
-    keyBindings: {
-        moveLeft: "ArrowLeft",
-        moveRight: "ArrowRight",
-        moveDown: "ArrowDown",
-        drop: "Space",
-        clockWiseRotate: "KeyX",
-        anticlockWiseRotate: "KeyZ",
-    },
-    
-    setKeyBindings: (newBindings) =>
-        set((state) => ({
-              keyBindings: { ...state.keyBindings, ...newBindings },
-        })),
 }));
 
 function rotate(tetromino: number[], direction: number) {
