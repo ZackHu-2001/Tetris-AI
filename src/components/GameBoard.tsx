@@ -113,8 +113,8 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     moveRight: { code: "ArrowRight", displayName: "→" },
     moveLeft: { code: "ArrowLeft", displayName: "←" },
     drop: { code: "Space", displayName: "Space" },
-    anticlockWiseRotate: { code: "KeyZ", displayName: "Z" },
-    clockWiseRotate: { code: "KeyX", displayName: "X" },
+    spinLeft: { code: "KeyZ", displayName: "Z" },
+    spinRight: { code: "KeyX", displayName: "X" },
   },
 
   setKeyBindings: (control: string, newCode: string) => {

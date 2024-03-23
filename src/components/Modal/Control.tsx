@@ -14,17 +14,17 @@ export const getDisplayNameForKey = (code: string) => {
   if (!code) return "undefined";
   switch (code) {
     case "ArrowLeft":
-        return <FaArrowLeft />;
+        return <div className="key-icon button"><FaArrowLeft /></div>;
     case "ArrowRight":
-        return <FaArrowRight />;
+        return <div className="key-icon button"><FaArrowRight /></div>;
     case "ArrowUp":
-        return <FaArrowUp />;
+        return <div className="key-icon button"><FaArrowUp /></div>;
     case "ArrowDown":
-        return <FaArrowDown />;
+        return <div className="key-icon button"><FaArrowDown /></div>;
     case "Space":
-        return "Space";
+        return <div className="key-icon button">Space</div>;
     default:
-        return code.replace(/Key|Digit/g, "");
+        return <div className="key-icon button">{code.replace(/Key|Digit/g, "")}</div>;
   }
 };
 

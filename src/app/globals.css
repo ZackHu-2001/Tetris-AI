@@ -47,21 +47,38 @@ body {
 }
 
 .my-6 {
-    color: #ddbea9;
+  color: #ddbea9;
 }
 .control-panel {
-    font-size: 3rem;
-    color: #ddbea9;
+  font-size: 3rem;
+  color: #ddbea9;
 }
 
 .control-panel .controls-container .control-item {
-    display: flex; /* This makes the child elements line up horizontally */
-    justify-content: space-between; /* This separates the control name and button */
-    align-items: center; /* This vertically centers the control name and button */
-    width: 100%; /* Adjust as necessary to control the width of the line */
-    margin-bottom: 10px; /* Adds a little space between each control line */
+  display: flex; /* This makes the child elements line up horizontally */
+  justify-content: space-between; /* This separates the control name and button */
+  align-items: center; /* This vertically centers the control name and button */
+  width: 100%; /* Adjust as necessary to control the width of the line */
+  margin-bottom: 10px; /* Adds a little space between each control line */
 }
 
 .control-panel .control-name {
-    margin-right: 10px; /* Adds a little space between the control name and the button */
+  margin-right: 10px; /* Adds a little space between the control name and the button */
+}
+
+.key-icon.button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px; 
+  height: 20px; 
+  background-color: #f0f0f0; 
+  border: 1px solid #ccc; 
+  border-radius: 4px; 
+  cursor: pointer;
+}
+
+.key-icon.button:hover {
+  background-color: #e0e0e0;
+  border-color: #aaa; 
 }
