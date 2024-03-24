@@ -12,7 +12,7 @@ const TetrominoBlock = ({ filled, color }: { filled: boolean, color: string }) =
 
 const NextTetromino = ({ tetromino }: { tetromino: number[] }) => {
     const tetroColor = mapColor(tetromino);
-    const cols = 4; // Assuming a standard width for tetrominos
+    const cols = mapColumn(tetromino); // Assuming a standard width for tetrominos
     var tetrominoCopy = [];
     for (let i = 0; i < tetromino.length; i++) {
         if (tetromino[i] !== 0) {
@@ -30,7 +30,7 @@ const NextTetromino = ({ tetromino }: { tetromino: number[] }) => {
                 <div key={rowIndex} className='flex'>
                     {Array.from({ length: cols }).map((_, colIndex) => {
                         const isFilled = !!(row & (1 << (cols - 1 - colIndex)));
-                        return isFilled ? <TetrominoBlock key={colIndex} filled={isFilled} color={tetroColor} /> : null;
+                        return  <TetrominoBlock key={colIndex} filled={isFilled} color={tetroColor} />;
                         // Return null for empty cells, so they don't get rendered
                     })}
                 </div>
@@ -76,6 +76,26 @@ function mapColor(arr: number[]) {
             return '';
     }
 }
+
+function mapColumn(arr : number[]) {
+    switch (arr.join('')) {
+        case '01500':
+            return 4;
+        case '470':
+            return 3;
+        case '270':
+            return 3;
+        case '170':
+            return 3;
+        case '33':
+            return 2;
+        case '036':
+            return 3;
+        case '063':
+            return 3;
+        default:
+            return 0;
+}}
 
 export default NextPanel;
 
