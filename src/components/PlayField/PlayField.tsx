@@ -34,10 +34,10 @@ const PlayField: React.FC<PlayFieldProps> = () => {
                     setStatus('paused');
                     setModal('pauseMenu');
                     break;
-                case keyBindings.anticlockWiseRotate.code:
+                case keyBindings.spinLeft.code:
                     anticlockWiseRotate();
                     break;
-                case keyBindings.clockWiseRotate.code:
+                case keyBindings.spinRight.code:
                     clockWiseRotate();
                     break;
             }
