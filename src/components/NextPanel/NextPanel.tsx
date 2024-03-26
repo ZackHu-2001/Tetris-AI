@@ -1,9 +1,7 @@
 
 
 import React from 'react';
-import { useGameBoard } from '@/components/GameBoard'; // Ensure correct path
-
-
+import { useGameBoard, pack } from '@/components/GameBoard'; // Ensure correct path
 
 // Annotating the `filled` prop type directly in the parameter list
 const TetrominoBlock = ({ filled, color }: { filled: boolean, color: string }) => (
@@ -48,8 +46,8 @@ const NextPanel = () => {
 
             <div className='h-full py-[10rem] flex flex-col justify-between items-center'>
 
-                {nextTetrominoQueue.map((tetromino, index) => (
-                     index <= 6 ? <NextTetromino key={index} tetromino={tetromino} /> : null
+                {nextTetrominoQueue.map((tetrominoIndex, index) => (
+                     index <= 6 ? <NextTetromino key={index} tetromino={pack[tetrominoIndex]} /> : null
                 ))}
             </div>
         </div>
