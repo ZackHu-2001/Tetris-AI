@@ -7,7 +7,7 @@ const PlayField: React.FC<PlayFieldProps> = () => {
     const { setStatus, setModal, board, moveDown, moveLeft, moveRight, drop, clockWiseRotate, anticlockWiseRotate, keyBindings } = useGameBoard()
     const rowNum = 20;
     const colNum = 10;
-    const boradLength = Object.keys(board).length;
+    const boardLength = Object.keys(board).length;
     let counted = false;
     let tetrominoCopy = [];
 
@@ -56,7 +56,7 @@ const PlayField: React.FC<PlayFieldProps> = () => {
         <div className='absolute w-full h-full top-0 left-0 z-10 flex flex-col '>
             {board.map((row, rowIndex) => {
                 counted = false;
-                if (rowIndex < boradLength - tetrominoCopy.length){
+                if (rowIndex < boardLength - tetrominoCopy.length){
                 return (<div style={{height: '5%'}} className='w-full flex ' key={rowIndex}>
                     {Array.from({ length: colNum }).map((_, i) => {
                         return (
@@ -72,7 +72,6 @@ const PlayField: React.FC<PlayFieldProps> = () => {
                                     return ''
                                 }
                             })()}}>
-                                {/* {row & (1 << i)} */}
                             </div>
                         )
 
@@ -90,14 +89,13 @@ const PlayField: React.FC<PlayFieldProps> = () => {
                                         tetrominoCopy.push(row);
                                     }
                                     return 'red'
-                                } else if (tetrominoCopy[rowIndex - boradLength + tetrominoCopy.length] & (1 << i)){
+                                } else if (tetrominoCopy[rowIndex - boardLength + tetrominoCopy.length] & (1 << i)){
                                     return 'lightcoral'
                                 }
                                 else {
                                     return ''
                                 }
                             })()}}>
-                                {/* {row & (1 << i)} */}
                             </div>
                         )
 
