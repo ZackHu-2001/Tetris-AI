@@ -55,11 +55,11 @@ body {
 }
 
 .control-panel .controls-container .control-item {
-  display: flex; /* This makes the child elements line up horizontally */
-  justify-content: space-between; /* This separates the control name and button */
-  align-items: center; /* This vertically centers the control name and button */
-  width: 100%; /* Adjust as necessary to control the width of the line */
-  margin-bottom: 10px; /* Adds a little space between each control line */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 10px;
 }
 
 .control-panel .control-name {
@@ -70,15 +70,47 @@ body {
   display: inline-flex;
   justify-content: center;
   align-items: center;
-  width: 40px; 
-  height: 20px; 
-  background-color: #f0f0f0; 
-  border: 1px solid #ccc; 
-  border-radius: 4px; 
+  width: 30rem;
+  height: 10rem;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 2rem;
   cursor: pointer;
 }
 
 .key-icon.button:hover {
   background-color: #e0e0e0;
-  border-color: #aaa; 
+  border-color: #aaa;
+}
+
+@media (max-width: 768px) {
+  .control-panel {
+    font-size: 2rem;
+  }
+
+  .title,
+  .timer-char {
+    font-size: 1.5rem;
+  }
+
+  .key-icon.button {
+    width: 20rem;
+    height: 7rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .control-panel {
+    font-size: 1.5rem;
+  }
+
+  .title,
+  .timer-char {
+    font-size: 1rem;
+  }
+
+  .key-icon.button {
+    width: 15rem;
+    height: 5rem;
+  }
 }
