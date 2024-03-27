@@ -6,7 +6,9 @@ type TimerProps = {
 };
 
 const Timer: React.FC<TimerProps> = ({ fontSize = "5rem" }) => {
-  const { gameState, moveDown, isNewGame, setIsNewGame, setOffSet } = useGameBoard();
+  const { gameState, moveDown, isNewGame, setIsNewGame, setOffSet,
+    canMoveDown_AI, moveDown_AI, updateAInextAction,
+     currentMove_AI, moveRight_AI, clockWiseRotate_AI } = useGameBoard();
 
   const [time, setTime] = useState(0);
 
@@ -21,10 +23,11 @@ const Timer: React.FC<TimerProps> = ({ fontSize = "5rem" }) => {
       seconds < 10 ? "0" + seconds : seconds
     }:${milliseconds < 10 ? "0" + milliseconds : milliseconds}`;
   };
-
+  
   useEffect(() => {
     let timerInterval: NodeJS.Timeout | undefined;
     let dropInterval: NodeJS.Timeout | undefined;
+    let takeActionInterval: NodeJS.Timeout | undefined;
 
     if (gameState.status == "playing") {
       if (isNewGame) {
@@ -38,6 +41,29 @@ const Timer: React.FC<TimerProps> = ({ fontSize = "5rem" }) => {
       dropInterval = setInterval(() => {
         moveDown();
       }, 1000);
+      if (gameState.mode == 'competition') {
+        takeActionInterval = setInterval(() => {
+          if (currentMove_AI[0] > 0) {
+            moveRight_AI()
+            currentMove_AI[0] -= 1;
+            return;
+          }
+          if (currentMove_AI[1] > 0) {
+            clockWiseRotate_AI()
+            currentMove_AI[1] -= 1;
+            return;
+          }
+          // 
+
+          while (canMoveDown_AI()) {
+            moveDown_AI();
+            return;
+          }
+
+          // if reached here, then update next action for AI
+          updateAInextAction()
+        }, 200);
+      }
     }
 
     if (gameState.status == "paused") {
@@ -58,6 +84,30 @@ const Timer: React.FC<TimerProps> = ({ fontSize = "5rem" }) => {
       clearInterval(dropInterval);
     }; // Cleanup function to clear the interval when the component unmounts or showTimer changes
   }, [gameState, setTime, moveDown]);
+
+
+  // useEffect(() => {
+
+  //   if (gameState.status == "playing") {
+  //     if (isNewGame) {
+  //       setIsNewGame(false);
+  //       setTime(0);
+  //       setOffSet([3, 0])
+  //     }
+  //   }
+
+  //   if (gameState.status == "paused") {
+      
+  //   }
+
+  //   if (gameState.status == "gameOver") {
+  //     setTime(0);
+  //   }
+
+  //   return () => {
+  //     clearInterval(dropInterval);
+  //   }; // Cleanup function to clear the interval when the component unmounts or showTimer changes
+  // }, [gameState, moveDown]);
 
   return (
     <div
