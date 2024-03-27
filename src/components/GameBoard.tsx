@@ -16,6 +16,13 @@ export type KeyBinding = {
     code: string | undefined;
     displayName: string | JSX.Element;
 };
+export type GameSettings = {
+    sound: boolean;
+    gravity: boolean;
+    volume: number;
+    ghost: boolean;
+    grid: boolean;
+};
 
 interface gameBoardInterface {
     gameState: GameState;
@@ -62,6 +69,10 @@ interface gameBoardInterface {
 
     keyBindings: Record<string, KeyBinding>;
     setKeyBindings: (control: string, newCode: string) => void;
+
+    settings: GameSettings;
+    setSettings: (newSettings: Partial<GameSettings>) => void;
+    setVolume: (volume: number) => void;
 }
 
 /**
@@ -418,6 +429,30 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     setIsNewGame: (isNewGame: boolean) => {
         set({ isNewGame });
     },
+
+    settings: {
+        sound: true,
+        gravity: true,
+        volume: 50,
+        ghost: true,
+        grid: true,
+    },
+
+    setSettings: (newSettings) => {
+        set((state) => ({
+            settings: {
+                ...state.settings,
+                ...newSettings,
+            },
+        }));
+    },
+    setVolume: (volume) =>
+        set((state) => ({
+            settings: {
+                ...state.settings,
+                volume: Math.max(0, Math.min(100, volume)), // Ensuring volume is between 0 and 100
+            },
+        })),
 }));
 
 function rotate(tetromino: number[], direction: number) {
