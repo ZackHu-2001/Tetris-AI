@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { getDisplayNameForKey } from './Modal/Control';
+import { stat } from "fs";
 
 
 export type GameState = {
@@ -16,6 +17,10 @@ export type KeyBinding = {
     code: string | undefined;
     displayName: string | JSX.Element;
 };
+
+interface NextStateDictionary {
+    [key: string]: number[];
+}
 
 interface gameBoardInterface {
     gameState: GameState;
@@ -47,7 +52,7 @@ interface gameBoardInterface {
     updateBoard: () => void;
 
     nextTetrominoQueue: number[];
-    initializeTetrominoQueue: () => void;
+    initializeTetrominoQueue: () => number[][];
     addPack: () => void;
     pop: () => Tetromino;
 
@@ -62,6 +67,43 @@ interface gameBoardInterface {
 
     keyBindings: Record<string, KeyBinding>;
     setKeyBindings: (control: string, newCode: string) => void;
+
+    gameBoard_AI: GameBoard;
+    addTetromino_AI: (tetromino: Tetromino) => void;
+    initializeGameBoard_AI: () => void;
+
+    updateAIBoard: () => void;
+
+    fallingTetromino_AI: GameBoard;
+    setFallingTetromino_AI: (tetromino: Tetromino) => void;
+    // moveLeft_AI: () => void;
+    moveRight_AI: () => void;
+    canMoveDown_AI: () => boolean;
+    moveDown_AI: () => void;
+    clockWiseRotate_AI: () => void;
+    // anticlockWiseRotate: () => void;
+    // fallingTetrominoAI: GameBoard;
+    offSet_AI: number[];
+    setAIOffSet: (offSet: number[]) => void;
+    popFromAIQueue: () => Tetromino;
+
+    nextTetrominoQueue_AI: number[];
+    AIresponseQueue: number[][];
+    currentMove_AI: number[];
+
+    appendAIResponse: (response: number[]) => void;
+    updateAInextAction: () => number[];
+    score_AI: number;
+    lines_AI: number;
+    checkAndClearLines_AI: () => void;
+    // boardAI: GameBoard;
+    // popFromAIQueue: () => Tetromino;
+    // getNextStates:() => NextStateDictionary;
+    // checkCollision(tetromino: Tetromino, state: gameBoardInterface): boolean;
+    // getStateProperties: (board: GameBoard) => number[];
+    // getHoles(board: GameBoard): number;
+    // getBumpinessAndHeight(board: GameBoard): number[];
+    // checkClearedRows(board: GameBoard): [number, GameBoard];
 }
 
 /**
@@ -337,14 +379,24 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
     nextTetrominoQueue: [] as number[],
     initializeTetrominoQueue: () => {
-        set({ nextTetrominoQueue: generateIndex() });
+        let newPack = generateIndex();
+        set({ nextTetrominoQueue: newPack });
+        if (get().gameState.mode === "competition") {
+            set({ nextTetrominoQueue_AI: newPack });
+        }
+        console.log(get().nextTetrominoQueue_AI, get().nextTetrominoQueue);
+        return [get().nextTetrominoQueue_AI, get().nextTetrominoQueue]
     },
 
     addPack: () => {
+        let newPack = generateIndex();
         set((state) => {
             // const newPack = generateIndex();
-            return { nextTetrominoQueue: state.nextTetrominoQueue.concat(generateIndex()) };
+            return { nextTetrominoQueue: state.nextTetrominoQueue.concat(newPack) };
         });
+        if (get().gameState.mode === "competition") {
+            set({ nextTetrominoQueue_AI: get().nextTetrominoQueue_AI.concat(newPack) })
+        }
     },
 
     pop: () => {
@@ -355,6 +407,20 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
         const popedValue = pack[get().nextTetrominoQueue[0]];
         get().setFallingShape(popedValue);
+        get().setOffSet([3, 0]);
+        set((state) => ({
+            nextTetrominoQueue: get().nextTetrominoQueue.slice(1),
+        }));
+        return popedValue;
+    },
+
+    popFromAIQueue: () => {
+        if (get().nextTetrominoQueue_AI.length <= 6) {
+            get().addPack();
+        }
+
+        const popedValue = get().nextTetrominoQueue_AI[0];
+        get().setFallingShape_AI(popedValue);
         get().setOffSet([3, 0]);
         set((state) => ({
             nextTetrominoQueue: get().nextTetrominoQueue.slice(1),
@@ -417,6 +483,196 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     isNewGame: false,
     setIsNewGame: (isNewGame: boolean) => {
         set({ isNewGame });
+    },
+
+    gameBoard_AI: [],
+    addTetromino_AI: (tetromino) => {
+        set((state) => {
+            const newGameBoard: number[] = Array(rowNum).fill(0);
+            for (let i = 0; i < tetromino.length; i++) {
+                newGameBoard[i] = state.gameBoard_AI[i] | tetromino[i];
+            }
+
+            return { gameBoard_AI: newGameBoard };
+        });
+        get().updateAIBoard();
+    },
+
+    updateAIBoard: () => { },
+
+    initializeGameBoard_AI: () => {
+        set((state) => {
+            return { gameBoard_AI: Array(rowNum).fill(0) };
+        });
+    },
+
+    fallingTetromino_AI: [],
+
+    setFallingTetromino_AI: (tetromino: Tetromino) => {
+        const tetrominoCopy: GameBoard = [];
+        for (const row of tetromino) {
+            if (row !== 0) {
+                tetrominoCopy.push(row);
+            }
+        }
+        set({
+            fallingTetromino: tetrominoCopy.concat(
+                Array(20 - tetrominoCopy.length).fill(0)
+            ),
+        });
+    },
+
+    moveRight_AI: () => {
+        set((state) => {
+            let canMove = true;
+            state.fallingTetromino_AI.map((row) => {
+                if (row & (1 << 9)) {
+                    canMove = false;
+                }
+            });
+            if (canMove) {
+                get().setAIOffSet([get().offSet_AI[0] + 1, get().offSet_AI[1]]);
+
+                const newTetromino = state.fallingTetromino_AI.map((row) => {
+                    row = row << 1;
+                    return row;
+                });
+                return { fallingTetromino_AI: newTetromino };
+            } else {
+                return { fallingTetromino_AI: state.fallingTetromino_AI };
+            }
+        });
+
+        get().updateAIBoard();
+    },
+
+    canMoveDown_AI: () => {
+
+        if (get().fallingTetromino_AI[get().fallingTetromino_AI.length - 1]) {
+            return false;
+        }
+
+        const newTetromino = [0].concat(get().fallingTetromino_AI.slice(0, -1));
+        for (let i = 0; i < get().fallingTetromino_AI.length; i++) {
+            if (get().gameBoard_AI[i] & newTetromino[i]) {
+                return false;
+            }
+        }
+        return true;
+    },
+
+    moveDown_AI: () => {
+
+        // annonymous function to determine if can move down
+        if (get().canMoveDown_AI()) {
+            get().setAIOffSet([get().offSet[0], get().offSet[1] + 1]);
+            set({ fallingTetromino_AI: [0].concat(get().fallingTetromino_AI.slice(0, -1)) });
+        } else {
+            // TODO handle attach
+
+            // reset offset
+            get().setAIOffSet([3, 0]);
+
+            // add current falling tetromino to the game board
+            get().addTetromino_AI(get().fallingTetromino_AI);
+
+            // check if have any line to clear
+            get().checkAndClearLines_AI();
+
+            // pop the next element
+            get().setFallingTetromino_AI(get().popFromAIQueue());
+            return {};
+        }
+        get().updateAIBoard();
+    },
+
+    clockWiseRotate_AI: () => { },
+
+    offSet_AI: [],
+
+    setAIOffSet: (offSet: number[]) => {
+        set({ offSet_AI: offSet });
+    },
+
+    nextTetrominoQueue_AI: [],
+    AIresponseQueue: [],
+    currentMove_AI: [],
+
+    appendAIResponse: (response: number[]) => {
+        set((state) => {
+            return { AIresponseQueue: state.AIresponseQueue.concat(response) };
+        });
+    },
+
+    updateAInextAction: () => {
+
+        // if no action in the queue, return -1
+        if (get().AIresponseQueue.length === 0) {
+            return [-1, -1];
+        }
+
+        // if the action's length is shorter than 7, fetch new actions
+
+        const bufferSize = 7;
+
+        if (get().AIresponseQueue[0].length <= bufferSize) {
+
+            let dataToSend = {
+                'nextTetrominoQueueAI': get().nextTetrominoQueue_AI,
+                'gameBoard': get().gameBoard_AI,
+            }
+
+            fetch('http://127.0.0.1:5001/tetris-group6/us-central1/get_next_action', {
+                // fetch('https://get-next-action-juv6snyduq-uc.a.run.app', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ dataToSend }),
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            }).then(data => {
+                console.log('data', data)
+                data.splice(0, bufferSize)
+                get().appendAIResponse(data)
+
+                // setFallingShape(data.action)
+            })
+        }
+
+        const action = get().AIresponseQueue[0];
+        set((state) => {
+            return { AIresponseQueue: state.AIresponseQueue.slice(1), currentMove_AI: action };
+        });
+
+        return action;
+    },
+
+    score_AI: 0,
+    lines_AI: 0,
+
+    checkAndClearLines_AI: () => {
+        // clear line first
+        var cnt = 0;
+        for (let i = 0; i < rowNum; i++) {
+            if (get().gameBoard[i] === 1023) {
+                get().gameBoard.splice(i, 1);
+                get().gameBoard.unshift(0);
+                cnt += 1;
+            }
+        }
+
+        get().addScore(cnt);
+
+        // check if the top line is full
+        if (get().gameBoard[0] !== 0 || get().gameBoard[1] !== 0) {
+            get().setStatus("gameOver");
+            get().setModal("gameOver");
+            get().setWinOrLose("lose");
+        }
     },
 }));
 
