@@ -21,6 +21,13 @@ export type KeyBinding = {
 interface NextStateDictionary {
     [key: string]: number[];
 }
+export type GameSettings = {
+    sound: boolean;
+    gravity: boolean;
+    volume: number;
+    ghost: boolean;
+    grid: boolean;
+};
 
 interface gameBoardInterface {
     gameState: GameState;
@@ -67,6 +74,10 @@ interface gameBoardInterface {
 
     keyBindings: Record<string, KeyBinding>;
     setKeyBindings: (control: string, newCode: string) => void;
+
+    settings: GameSettings;
+    setSettings: (newSettings: Partial<GameSettings>) => void;
+    setVolume: (volume: number) => void;
 
     gameBoard_AI: GameBoard;
     addTetromino_AI: (tetromino: Tetromino) => void;
@@ -484,6 +495,30 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     setIsNewGame: (isNewGame: boolean) => {
         set({ isNewGame });
     },
+
+    settings: {
+        sound: true,
+        gravity: true,
+        volume: 50,
+        ghost: true,
+        grid: true,
+    },
+
+    setSettings: (newSettings) => {
+        set((state) => ({
+            settings: {
+                ...state.settings,
+                ...newSettings,
+            },
+        }));
+    },
+    setVolume: (volume) =>
+        set((state) => ({
+            settings: {
+                ...state.settings,
+                volume: Math.max(0, Math.min(100, volume)), // Ensuring volume is between 0 and 100
+            },
+        })),
 
     gameBoard_AI: [],
     addTetromino_AI: (tetromino) => {
