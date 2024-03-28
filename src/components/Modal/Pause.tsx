@@ -14,6 +14,7 @@ const Pause: React.FC<PauseProps> = () => {
     const handleRetry = () => {
         setStatus("playing")
         setModal(null)
+        setWinOrLose(null);
         
         // reset timer
         setIsNewGame(true)
@@ -31,12 +32,6 @@ const Pause: React.FC<PauseProps> = () => {
         setFallingShape(NextTetromino);
         
         updateBoard();
-
-        // change global game state
-        setStatus('playing');
-        setMode('sprint');
-        setModal(null);
-        setWinOrLose(null);
     }
 
     const handleClickMainMenu = () => {
@@ -44,7 +39,6 @@ const Pause: React.FC<PauseProps> = () => {
         setModal('mainMenu')
         // reset timer
         setIsNewGame(true)
-
     }
 
     return <div className='w-full h-full flex flex-col justify-center items-center'>
