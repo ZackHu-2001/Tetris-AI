@@ -17,17 +17,13 @@ const NextTetromino = ({ tetromino }: { tetromino: number[] }) => {
             tetrominoCopy.push(tetromino[i]);
         }
     }
-    if (tetrominoCopy[0] == 15) {
-        tetrominoCopy = [0].concat(tetrominoCopy);
-    }
-
 
     return (
         <div className='flex flex-col'>
             {tetrominoCopy.map((row, rowIndex) => (
                 <div key={rowIndex} className='flex'>
                     {Array.from({ length: cols }).map((_, colIndex) => {
-                        const isFilled = !!(row & (1 << (cols - 1 - colIndex)));
+                        const isFilled = !!(row & (1 << (colIndex)));
                         return  <TetrominoBlock key={colIndex} filled={isFilled} color={tetroColor} />;
                         // Return null for empty cells, so they don't get rendered
                     })}
@@ -37,14 +33,18 @@ const NextTetromino = ({ tetromino }: { tetromino: number[] }) => {
     );
 };
 
-const NextPanel = () => {
-    const { nextTetrominoQueue } = useGameBoard();
+type NextPanelProps = {
+    nextTetrominoQueue: number[];
+    height: number;
+};
+
+const NextPanel: React.FC<NextPanelProps> = ({ nextTetrominoQueue, height }) => {
 
     return (
-        <div style={{ width: '25%', fontSize: '5rem' }} className='flex flex-col items-center p-4'>
+        <div style={{ fontSize: '5rem', height: height + '%' }} className='flex flex-col items-center p-4'>
             <div style={{ fontWeight: 'bold' }}>NEXT</div>
 
-            <div className='h-full py-[10rem] flex flex-col justify-between items-center'>
+            <div className='h-full py-[5rem] flex flex-col justify-between items-center'>
 
                 {nextTetrominoQueue.map((tetrominoIndex, index) => (
                      index <= 6 ? <NextTetromino key={index} tetromino={pack[tetrominoIndex]} /> : null
