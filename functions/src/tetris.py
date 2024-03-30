@@ -23,32 +23,20 @@ class Tetris:
         (0, 0, 255)
     ]
 
-    pieces = [
-        [[5, 5, 5, 5]],
-
-        [[0, 0, 6],
-         [6, 6, 6]],
-
-        [[7, 0, 0],
-         [7, 7, 7]],
-         
-        [[1, 1],
-         [1, 1]],
-
-        [[4, 4, 0],
-         [0, 4, 4]],
-
-        [[0, 2, 0],
-         [2, 2, 2]],
-
-        [[0, 3, 3],
-         [3, 3, 0]],
-
-    ]
-
     # pieces = [
+    #     [[5, 5, 5, 5]],
+
+    #     [[0, 0, 6],
+    #      [6, 6, 6]],
+
+    #     [[7, 0, 0],
+    #      [7, 7, 7]],
+         
     #     [[1, 1],
     #      [1, 1]],
+
+    #     [[4, 4, 0],
+    #      [0, 4, 4]],
 
     #     [[0, 2, 0],
     #      [2, 2, 2]],
@@ -56,17 +44,32 @@ class Tetris:
     #     [[0, 3, 3],
     #      [3, 3, 0]],
 
-    #     [[4, 4, 0],
-    #      [0, 4, 4]],
-
-    #     [[5, 5, 5, 5]],
-
-    #     [[0, 0, 6],
-    #      [6, 6, 6]],
-
-    #     [[7, 0, 0],
-    #      [7, 7, 7]]
     # ]
+    mapping = {
+
+    }
+
+    pieces = [
+        [[1, 1],
+         [1, 1]],
+
+        [[0, 2, 0],
+         [2, 2, 2]],
+
+        [[0, 3, 3],
+         [3, 3, 0]],
+
+        [[4, 4, 0],
+         [0, 4, 4]],
+
+        [[5, 5, 5, 5]],
+
+        [[0, 0, 6],
+         [6, 6, 6]],
+
+        [[7, 0, 0],
+         [7, 7, 7]]
+    ]
 
     def __init__(self, nextPieceQueue, gameBoard, height=20, width=10, block_size=20):
         self.nextPieceQueue = nextPieceQueue
@@ -86,7 +89,7 @@ class Tetris:
             for i in range(self.width):
                 newRow.append(1 if int(row) & int(1 << i) else 0)
             self.board.append(newRow)
-        print(self.board)
+        # print(self.board)
         
         # self.board = [[0] * self.width for _ in range(self.height)]
         # self.board = [[0] * self.width for _ in range(self.height)]
@@ -96,7 +99,8 @@ class Tetris:
         # self.bag = list(range(len(self.pieces)))
         # random.shuffle(self.bag)
         # self.ind = self.bag.pop()
-        self.ind = self.nextPieceQueue.pop()
+        self.ind = self.nextPieceQueue.pop(0)
+        print("after pop",self.nextPieceQueue)
         self.piece = [row[:] for row in self.pieces[self.ind]]
         self.current_pos = {"x": self.width // 2 - len(self.piece[0]) // 2, "y": 0}
         self.gameover = False
@@ -118,6 +122,7 @@ class Tetris:
         lines_cleared, board = self.check_cleared_rows(board)
         holes = self.get_holes(board)
         bumpiness, height = self.get_bumpiness_and_height(board)
+        # print(self.nextPieceQueue)
 
         return torch.FloatTensor([lines_cleared, holes, bumpiness, height])
 
@@ -145,8 +150,9 @@ class Tetris:
     def get_next_states(self):
         states = {}
         piece_id = self.ind
+
         curr_piece = [row[:] for row in self.piece]
-        # print(curr_piece, piece_id)
+        print(curr_piece, piece_id, self.nextPieceQueue)
         if piece_id == 0:  # O piece
             num_rotations = 1
         elif piece_id == 2 or piece_id == 3 or piece_id == 4:
@@ -176,14 +182,15 @@ class Tetris:
         return board
 
     def new_piece(self):
-        if len(self.nextPieceQueue) == 1:
-            print(self.nextPieceQueue)
+        if len(self.nextPieceQueue) == 0:
+            # print(self.nextPieceQueue)
             print("nextPieceQueue reached the end")
             self.gameover = True
+            return
         # if not len(self.bag):
         #     self.bag = list(range(len(self.pieces)))
         #     random.shuffle(self.bag)
-        self.ind = self.nextPieceQueue.pop()
+        self.ind = self.nextPieceQueue.pop(0)
         # self.ind = self.bag.pop()
         self.piece = [row[:] for row in self.pieces[self.ind]]
         self.current_pos = {"x": self.width // 2 - len(self.piece[0]) // 2,
