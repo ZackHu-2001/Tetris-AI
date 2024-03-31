@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { getDisplayNameForKey } from './Modal/Control';
-import { stat } from "fs";
 
+const generatePackCnt = 10;
 
 export type GameState = {
     status: "paused" | "playing" | "gameOver" | null;
@@ -245,11 +245,24 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     moveLeft: () => {
         set((state) => {
             let canMove = true;
+            
+            // first check if attach the wall
             state.fallingTetromino.map((row) => {
                 if (row & 1) {
                     canMove = false;
                 }
             });
+            
+            // then check if attach the game board
+            const fallingTetrominoCopy = state.fallingTetromino.map((row) => {
+                return row >> 1;
+            });
+            
+            for (let i = 0; i < fallingTetrominoCopy.length; i++) {
+                if (state.gameBoard[i] & fallingTetrominoCopy[i]) {
+                    canMove = false;
+                }
+            }
 
             if (canMove) {
                 get().setOffSet([get().offSet[0] - 1, get().offSet[1]]);
@@ -265,15 +278,28 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         get().updateBoard();
     },
 
-    // first check if attach the wall, if not then move
     moveRight: () => {
         set((state) => {
             let canMove = true;
+
+            // first check if attach the wall
             state.fallingTetromino.map((row) => {
                 if (row & (1 << 9)) {
                     canMove = false;
                 }
             });
+
+            // then check if attach the game board
+            const fallingTetrominoCopy = state.fallingTetromino.map((row) => {
+                return row << 1;
+            });
+            
+            for (let i = 0; i < fallingTetrominoCopy.length; i++) {
+                if (state.gameBoard[i] & fallingTetrominoCopy[i]) {
+                    canMove = false;
+                }
+            }
+
             if (canMove) {
                 get().setOffSet([get().offSet[0] + 1, get().offSet[1]]);
 
@@ -926,16 +952,6 @@ export const tetrominos: Record<string, Tetromino> = {
     Z: [0, 6, 3],
 };
 
-// export const pack = [
-//     [0, 15, 0, 0],
-//     [4, 7, 0],
-//     [1, 7, 0],
-//     [3, 3],
-//     [0, 3, 6],
-//     [2, 7, 0],
-//     [0, 6, 3],
-// ];
-
 export const pack = [
     [3, 3],
     [2, 7, 0],
@@ -949,7 +965,7 @@ export const pack = [
 // generate 10 pack of tetromino, return the indexs of those tetromino
 const generateIndex = () => {
     let indexs: number[] = []
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < generatePackCnt; i++) {
         let index = [0, 1, 2, 3, 4, 5, 6];
         for (let i = pack.length - 1; i > 0; i--) {
             // Generate a random index
