@@ -64,17 +64,16 @@ const Control: React.FC<ControlProps> = () => {
       <div
         style={{
           fontSize: "3rem",
-          paddingLeft: "4rem",
-          paddingRight: "4rem",
+          margin: "4rem",
           textAlign: "center",
         }}
       >
         Click on the control you want to change, then press any key.
       </div>
-      <div className="controls-container">
+      <div className="flex flex-col w-full px-24 py-12 control">
         {Object.entries(keyBindings).map(([control, binding]) => (
-          <div key={control} className="control-item flex items-center">
-            <div className="control-name">
+          <div key={control} className="flex items-center justify-between mb-8">
+            <div >
               {`${
                 control.charAt(0).toUpperCase() +
                 control.slice(1).replace(/([A-Z])/g, " $1")

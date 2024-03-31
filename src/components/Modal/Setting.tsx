@@ -33,7 +33,7 @@ const { setModal, settings, setSettings } = useGameBoard();
         return (
           <div
             key={key}
-            className="setting flex items-center justify-between w-full my-2 text-white"
+            className="setting flex items-center justify-between w-full mb-8 px-20 text-white"
           >
             <span className="flex-1 text-left">
               {key.charAt(0).toUpperCase() + key.slice(1)}:
