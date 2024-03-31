@@ -67,21 +67,17 @@ const Timer: React.FC<TimerProps> = ({ fontSize = "5rem" }) => {
       return;
     }
     let takeActionInterval: NodeJS.Timeout | undefined;
-    
-    if (gameState.status == "paused") {
-      clearInterval(takeActionInterval);
-    }
 
     takeActionInterval = setInterval(() => {
       moveDown_AI();
-    }, 100);
-
-    if (gameState.status == "paused") {
+    }, 50);
+    
+    if (gameState.status == "paused" || gameState.status == "gameOver") {
       clearInterval(takeActionInterval);
     }
+
     return () => {
       clearInterval(takeActionInterval);
-
     }
   }, [AIready, gameState]);
 

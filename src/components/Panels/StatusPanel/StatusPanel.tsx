@@ -18,7 +18,6 @@ const StatusPanel: React.FC<StatusPanelProps> = ({ AIcontrol }) => {
             <div>Score: {s}</div>
             <div>Lines: {l}</div>
             <Timer fontSize='5rem' />
-            {/* <div>{gameState.winOrLose}</div> */}
         </div>
     )
 }

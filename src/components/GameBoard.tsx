@@ -30,6 +30,8 @@ export type GameSettings = {
 };
 
 interface gameBoardInterface {
+    startGame: (mode: "sprint" | "endless" | "competition") => void;
+
     gameState: GameState;
     setStatus: (status: GameState["status"]) => void;
     setMode: (mode: GameState["mode"]) => void;
@@ -152,6 +154,65 @@ const getDropPosition = (state: gameBoardInterface): Tetromino => {
 };
 
 export const useGameBoard = create<gameBoardInterface>((set, get) => ({
+    startGame: (mode: "sprint" | "endless" | "competition") => {
+        // change global state
+        set({ isNewGame: true });
+        get().setStatus('playing');
+        get().setMode(mode);
+        get().setModal(null);
+        get().setWinOrLose(null);
+
+        // initialize nextTetrominoQueue
+        let nextTetrominoQueueAI = null;
+        let nextTetrominoQueue = null;
+        [nextTetrominoQueueAI, nextTetrominoQueue] = get().initializeTetrominoQueue();
+
+        // initialize game board
+        get().initializeGameBoard();
+
+        // initialize status panel
+        get().initializeStatusPanel();
+
+        // initialize fallingTetromino
+        const NextTetromino = get().pop();
+        get().setFallingTetromino(NextTetromino);
+
+        get().updateBoard();
+
+        if (get().gameState.mode === 'competition') {
+
+            // clear AI's response queue
+            set({ AIresponseQueue: [] });
+        
+            let dataToSend = {
+                'nextTetrominoQueueAI': nextTetrominoQueueAI,
+                'gameBoard': new Array(rowNum).fill(0),
+            }
+            console.log("nextqueue", nextTetrominoQueueAI)
+    
+            fetch('http://127.0.0.1:5001/tetris-group6/us-central1/get_next_action', {
+                // fetch('https://get-next-action-juv6snyduq-uc.a.run.app', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ dataToSend }),
+            }).then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            }).then(data => {
+                get().appendAIResponse(data)
+                get().updateAInextAction()
+                console.log(data)
+                get().setAIready(true)
+            })
+    
+            get().updateAIBoard();
+        }
+    },
+
     gameState: { status: null, mode: null, modal: "mainMenu", winOrLose: null },
     setStatus: (status: GameState["status"]) =>
         set((state) => ({ gameState: { ...state.gameState, status } })),
@@ -218,7 +279,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
     initializeGameBoard: () => {
         set((state) => {
-            return { gameBoard: Array(rowNum).fill(0) };
+            return { gameBoard: Array(rowNum).fill(0), gameBoard_AI: Array(rowNum).fill(0)};
         });
     },
 
@@ -245,19 +306,19 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     moveLeft: () => {
         set((state) => {
             let canMove = true;
-            
+
             // first check if attach the wall
             state.fallingTetromino.map((row) => {
                 if (row & 1) {
                     canMove = false;
                 }
             });
-            
+
             // then check if attach the game board
             const fallingTetrominoCopy = state.fallingTetromino.map((row) => {
                 return row >> 1;
             });
-            
+
             for (let i = 0; i < fallingTetrominoCopy.length; i++) {
                 if (state.gameBoard[i] & fallingTetrominoCopy[i]) {
                     canMove = false;
@@ -293,7 +354,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             const fallingTetrominoCopy = state.fallingTetromino.map((row) => {
                 return row << 1;
             });
-            
+
             for (let i = 0; i < fallingTetrominoCopy.length; i++) {
                 if (state.gameBoard[i] & fallingTetrominoCopy[i]) {
                     canMove = false;
@@ -477,7 +538,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             get().setLines(0);
         }
     },
-    
+
     score: 0,
     lines: 0,
     setLines: (lines: number) => {
@@ -497,7 +558,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             // Update the score based on the lines cleared, you can adjust the scoring logic
             const scoreToAdd = scoreArray[linesCleared];
             const newScore = state.score + scoreToAdd;
-            return { score: newScore};
+            return { score: newScore };
         });
     },
 
@@ -530,7 +591,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             get().setWinOrLose("win");
             console.log("win")
         }
-        
+
         // check if the top line is full
         if (get().gameBoard[0] !== 0 || get().gameBoard[1] !== 0) {
             get().setStatus("gameOver");

@@ -5,39 +5,13 @@ import { rowNum, useGameBoard } from '../GameBoard';
 type GameOverProps = {};
 
 const GameOver: React.FC<GameOverProps> = () => {
-    const { gameState, setStatus, pop, setLines, offSet, updateBoard, setFallingShape, setWinOrLose, setModal, setMode, initializeTetrominoQueue, setIsNewGame, setFallingTetromino, initializeGameBoard } = useGameBoard();
-    const handleReturn = () => {
-        setStatus("playing")
-        setModal(null)
-        setWinOrLose(null);
-    }
+    const { gameState, startGame, setStatus, pop, setLines, offSet, updateBoard, setFallingShape, setWinOrLose, setModal, setMode, initializeTetrominoQueue, setIsNewGame, setFallingTetromino, initializeGameBoard } = useGameBoard();
 
-    const handleRetry = () => {        
-        // reset timer
-        setIsNewGame(true)
-
-        // reset game board
-        // initialize nextTetrominoQueue
-        initializeTetrominoQueue();
-
-        // initialize game board
-        initializeGameBoard();
-
-        // initialize fallingTetromino
-        const NextTetromino = pop();
-        setFallingTetromino(NextTetromino);
-        setFallingShape(NextTetromino);
-        
-        updateBoard();
-        // reset lines
-        setLines(rowNum)
-
-        // change global game state
-        setStatus('playing');
-        setMode('sprint');
-        setModal(null);
-        setWinOrLose(null);
-
+    const handleRetry = () => { 
+        if (gameState.mode === null) {
+            throw new Error('gameState.mode is null')
+        }
+        startGame(gameState.mode)   
     }
 
     const handleClickMainMenu = () => {

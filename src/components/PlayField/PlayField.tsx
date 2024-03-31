@@ -6,7 +6,7 @@ type PlayFieldProps = {
 };
 
 const PlayField: React.FC<PlayFieldProps> = ({ AIcontrol }) => {
-    const { setStatus, setModal, board, board_AI, moveDown, moveLeft, moveRight, drop, clockWiseRotate, anticlockWiseRotate, keyBindings } = useGameBoard()
+    const { setStatus, setModal, board, board_AI, setAIready, moveDown, moveLeft, moveRight, drop, clockWiseRotate, anticlockWiseRotate, keyBindings } = useGameBoard()
     const rowNum = 20;
     const colNum = 10;
     const boardLength = Object.keys(board).length;
@@ -35,6 +35,7 @@ const PlayField: React.FC<PlayFieldProps> = ({ AIcontrol }) => {
                     // TODO show the pause menu
                     setStatus('paused');
                     setModal('pauseMenu');
+                    setAIready(false);
                     break;
                 case keyBindings.spinLeft.code:
                     anticlockWiseRotate();

@@ -99,7 +99,7 @@ export default function Home() {
             {gameState.mode === 'competition' &&
               <div style={{ width: 'var(--playFieldWidth)', height: 'var(--playFieldHeight)', borderWidth: '0.2vh', boxShadow: '0 0 1rem 0rem rgba(255,255,255)' }}
                 className=" relative bg-black box-border">
-                <BasicModal />
+                <BasicModal isAIPage={true}/>
                 <PlayField AIcontrol={true} />
               </div>}
 

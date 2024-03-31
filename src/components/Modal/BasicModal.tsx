@@ -7,6 +7,7 @@ import { useGameBoard } from '../GameBoard';
 import GameOver from './GameOver';
 
 type BasicModalProps = {
+    isAIPage?: boolean;
 };
 
 export function switchMenu(currentId: string, nextId: string) {
@@ -29,17 +30,19 @@ export function switchMenu(currentId: string, nextId: string) {
     }, 500);
 }
 
-const BasicModal: React.FC<BasicModalProps> = () => {
+const BasicModal: React.FC<BasicModalProps> = ({ isAIPage=false }) => {
     const { gameState } = useGameBoard();
 
     return (
         gameState.modal === null ? <></> :
             <div style={{ backgroundColor: 'rgba(0,0,0,0.8)', transition: 'opacity 0.3 easy-in-out' }} className='absolute w-full h-full z-20'>
-                {gameState.status === null && gameState.modal === 'mainMenu' && <MainMenu />}
-                {gameState.status === null && gameState.modal === 'control' && <Control />}
-                {gameState.status === 'paused' && gameState.modal === 'pauseMenu' && <Pause />}
-                {gameState.status === null && gameState.modal === 'setting' && <Setting />}
-                {gameState.status === 'gameOver' && gameState.modal === 'gameOver' && <GameOver />}
+                
+                {gameState.status === null && gameState.modal === 'mainMenu' && !isAIPage && <MainMenu />}
+                {gameState.status === null && gameState.modal === 'control' && !isAIPage && <Control />}
+                {gameState.status === 'paused' && gameState.modal === 'pauseMenu' && !isAIPage && <Pause />}
+                {gameState.status === null && gameState.modal === 'setting' && !isAIPage && <Setting />}
+                {gameState.status === 'gameOver' && gameState.modal === 'gameOver' && !isAIPage && <GameOver />}
+                
             </div>
     )
 }
