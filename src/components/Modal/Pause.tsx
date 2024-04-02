@@ -5,12 +5,12 @@ import { useGameBoard, rowNum } from '../GameBoard';
 type PauseProps = {};
 
 const Pause: React.FC<PauseProps> = () => {
-    const { gameState, AIready, setIsNewGame, setAIready, initializeStatusPanel,
-        initializeTetrominoQueue, pop, setFallingTetromino, updateAInextAction, initializeGameBoard, appendAIResponse,
-        setStatus, updateAIBoard, setModal, setWinOrLose, updateBoard, startGame } = useGameBoard();
+    const { gameState, AIready, setIsNewGame, setAIready, 
+        setStatus, setModal, startGame } = useGameBoard();
     const handleReturn = () => {
         setStatus("playing")
         setModal(null)
+        setAIready(true)
     }
 
     const handleRetry = () => {

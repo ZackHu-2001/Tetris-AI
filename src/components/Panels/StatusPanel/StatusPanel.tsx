@@ -13,7 +13,7 @@ const StatusPanel: React.FC<StatusPanelProps> = ({ AIcontrol }) => {
     let l = AIcontrol ? lines_AI : lines;
 
     return (
-        <div style={{ fontSize: `${gameState.mode !== 'competition' ? 5 : 4}rem` }} className=' flex flex-col items-center h-full justify-between'>
+        <div style={{ fontSize: `${gameState.mode !== 'competition' ? 5 : 4}rem` }} className=' flex flex-col items-center justify-between'>
             {gameState.mode !== 'competition' && <div style={{ fontWeight: 'bold' }}>STATUS</div>}
             <div className='flex flex-col items-center'>
                 <div className={`w-full flex flex-col items-center ${gameState.mode === "competition" ? 'py-4' : 'py-12'}`}>

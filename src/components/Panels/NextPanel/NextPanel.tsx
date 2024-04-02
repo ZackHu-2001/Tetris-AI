@@ -4,11 +4,12 @@ import React from 'react';
 import { useGameBoard, pack } from '@/components/GameBoard'; // Ensure correct path
 
 // Annotating the `filled` prop type directly in the parameter list
-const TetrominoBlock = ({ filled, color }: { filled: boolean, color: string }) => (
-    <div className={`w-16 h-16 ${filled ? `${color} border border-gray-200` : 'bg-transparent'} box-border`}></div>
+const TetrominoBlock = ({ filled, color, width }: { filled: boolean, color: string, width: number }) => (
+    filled ? <div className={color}></div> : <div style={{ width: width }} className='bg-transparent'></div>
 );
 
-const NextTetromino = ({ tetromino }: { tetromino: number[] }) => {
+
+const NextTetromino = ({ tetromino, width} : {tetromino: number[], width: number}) => {
     const tetroColor = mapColor(tetromino);
     const cols = mapColumn(tetromino); // Assuming a standard width for tetrominos
     var tetrominoCopy = [];
@@ -24,7 +25,7 @@ const NextTetromino = ({ tetromino }: { tetromino: number[] }) => {
                 <div key={rowIndex} className='flex'>
                     {Array.from({ length: cols }).map((_, colIndex) => {
                         const isFilled = !!(row & (1 << (colIndex)));
-                        return  <TetrominoBlock key={colIndex} filled={isFilled} color={tetroColor} />;
+                        return <TetrominoBlock key={colIndex} width={width} filled={isFilled} color={tetroColor} />;
                         // Return null for empty cells, so they don't get rendered
                     })}
                 </div>
@@ -40,6 +41,7 @@ type NextPanelProps = {
 
 const NextPanel: React.FC<NextPanelProps> = ({ nextTetrominoQueue, height }) => {
     const { gameState } = useGameBoard();
+    const width = Math.floor(parseFloat(document.documentElement.style.getPropertyValue('--brickWidth')));
     return (
         <div style={{ fontSize: '5rem', height: height + '%' }} className='flex flex-col items-center p-4'>
             <div style={{ fontWeight: 'bold' }}>NEXT</div>
@@ -47,7 +49,7 @@ const NextPanel: React.FC<NextPanelProps> = ({ nextTetrominoQueue, height }) => 
             <div className={`h-full py-[4rem] flex flex-col justify-between items-center`}>
 
                 {nextTetrominoQueue.map((tetrominoIndex, index) => (
-                     index <= 6 ? <NextTetromino key={index} tetromino={pack[tetrominoIndex]} /> : null
+                    index <= 6 ? <NextTetromino key={index} tetromino={pack[tetrominoIndex]} width={width} /> : null
                 ))}
             </div>
         </div>
@@ -57,25 +59,25 @@ const NextPanel: React.FC<NextPanelProps> = ({ nextTetrominoQueue, height }) => 
 function mapColor(arr: number[]) {
     switch (arr.join('')) {
         case '01500':
-            return 'bg-cyan-500';
+            return 'brick_skyBlue';
         case '470':
-            return 'bg-blue-500';
+            return 'brick_orange';
         case '270':
-            return 'bg-purple-500';
+            return 'brick_purple';
         case '170':
-            return 'bg-orange-500';
+            return 'brick_blue';
         case '33':
-            return 'bg-yellow-500';
+            return 'brick_yellow';
         case '036':
-            return 'bg-green-500';
+            return 'brick_red';
         case '063':
-            return 'bg-red-500';
+            return 'brick_green';
         default:
             return '';
     }
 }
 
-function mapColumn(arr : number[]) {
+function mapColumn(arr: number[]) {
     switch (arr.join('')) {
         case '01500':
             return 4;
@@ -93,7 +95,8 @@ function mapColumn(arr : number[]) {
             return 3;
         default:
             return 0;
-}}
+    }
+}
 
 export default NextPanel;
 

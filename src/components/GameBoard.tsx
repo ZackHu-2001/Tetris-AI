@@ -1,7 +1,8 @@
 import { create } from "zustand";
 import { getDisplayNameForKey } from './Modal/Control';
 
-const generatePackCnt = 10;
+const generatePackCnt = 100;
+const serverAPI = 'https://18.226.187.27:8000/process';
 
 export type GameState = {
     status: "paused" | "playing" | "gameOver" | null;
@@ -87,6 +88,9 @@ interface gameBoardInterface {
     AIready: boolean;
     setAIready: (isReady: boolean) => void;
 
+    waitingForAI: boolean;
+    setWaitingForAI: (isWaiting: boolean) => void;
+
     gameBoard_AI: GameBoard;
     addTetromino_AI: (tetromino: Tetromino) => void;
     initializeGameBoard_AI: () => void;
@@ -117,6 +121,7 @@ interface gameBoardInterface {
     setLines_AI: (lines: number) => void;
     addScore_AI: (linesCleared: number) => void;
     checkAndClearLines_AI: () => void;
+
 }
 
 /**
@@ -163,9 +168,10 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         get().setWinOrLose(null);
 
         // initialize nextTetrominoQueue
-        let nextTetrominoQueueAI = null;
-        let nextTetrominoQueue = null;
-        [nextTetrominoQueueAI, nextTetrominoQueue] = get().initializeTetrominoQueue();
+        // let nextTetrominoQueueAI = null;
+        // let nextTetrominoQueue = null;
+        // [nextTetrominoQueueAI, nextTetrominoQueue] = 
+        get().initializeTetrominoQueue();
 
         // initialize game board
         get().initializeGameBoard();
@@ -185,13 +191,11 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             set({ AIresponseQueue: [] });
         
             let dataToSend = {
-                'nextTetrominoQueueAI': nextTetrominoQueueAI,
+                'nextTetrominoQueueAI': get().nextTetrominoQueue_AI,
                 'gameBoard': new Array(rowNum).fill(0),
             }
-            console.log("nextqueue", nextTetrominoQueueAI)
-    
-            fetch('http://127.0.0.1:5001/tetris-group6/us-central1/get_next_action', {
-                // fetch('https://get-next-action-juv6snyduq-uc.a.run.app', {
+            console.log("nextqueue", get().nextTetrominoQueue_AI)
+            fetch(serverAPI, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -204,6 +208,8 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                 return response.json();
             }).then(data => {
                 get().appendAIResponse(data)
+
+                console.log("update next action in start game")
                 get().updateAInextAction()
                 console.log(data)
                 get().setAIready(true)
@@ -633,6 +639,11 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     AIready: false,
     setAIready: (isReady: boolean) => set((state) => ({ AIready: isReady })),
 
+    waitingForAI: false,
+    setWaitingForAI: (isWaiting: boolean) => {
+        set({ waitingForAI: isWaiting });
+    },
+
     gameBoard_AI: [],
     addTetromino_AI: (tetromino) => {
         // console.log(tetromino)
@@ -737,6 +748,9 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             get().checkAndClearLines_AI();
 
             // update next action for AI
+            console.log("update next action in move down")
+            console.log("len of response queue", get().AIresponseQueue.length)
+            console.log("len of action queue", get().nextTetrominoQueue_AI.length)
             get().updateAInextAction()
             // console.log(get().fallingTetromino_AI)
         }
@@ -774,25 +788,29 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     AIresponseQueue: [],
 
     appendAIResponse: (response: number[]) => {
+        console.log(get().AIresponseQueue)
         set((state) => {
             return { AIresponseQueue: state.AIresponseQueue.concat(response) };
         });
+        console.log(get().AIresponseQueue)
+
     },
 
     updateAInextAction: () => {
 
         // if the action's length is shorter than the buffer size, fetch new actions
-        const bufferSize = 1;
+        const bufferSize = 70;
 
-        if (get().AIresponseQueue.length <= bufferSize) {
+        if (get().AIresponseQueue.length <= bufferSize && !get().waitingForAI) {
+            const currentSize = get().AIresponseQueue.length;
+            get().addPack();
             let dataToSend = {
                 'nextTetrominoQueueAI': get().nextTetrominoQueue_AI,
                 'gameBoard': get().gameBoard_AI,
             }
             console.log('next tetromino queue AI', get().nextTetrominoQueue_AI)
-
-            fetch('http://127.0.0.1:5001/tetris-group6/us-central1/get_next_action', {
-                // fetch('https://get-next-action-juv6snyduq-uc.a.run.app', {
+            get().setWaitingForAI(true);
+            fetch(serverAPI, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -804,11 +822,11 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                 }
                 return response.json();
             }).then(data => {
-                console.log('data', data)
-                data.splice(0, bufferSize)
-                get().appendAIResponse(data)
-
-                // setFallingShape(data.action)
+                console.log(data)
+                // console.log()
+                get().appendAIResponse(data.slice(currentSize))
+                get().setAIready(true)
+                get().setWaitingForAI(false);
             })
         }
 
@@ -816,7 +834,6 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         get().setFallingTetromino_AI(get().popFromAIQueue());
 
         const action = get().AIresponseQueue[0];
-        console.log('ai response', action);
 
         set((state) => {
             return {

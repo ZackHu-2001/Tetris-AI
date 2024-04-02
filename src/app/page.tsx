@@ -75,6 +75,10 @@ export default function Home() {
         document.documentElement.style.setProperty('font-size', dimensions.height * 0.0045 * 1.5 + 'px');
       }
     }
+
+    const width = document.documentElement.style.getPropertyValue('--playFieldWidth');
+    document.documentElement.style.setProperty('--brickHalfWidth', (parseInt(width, 10) / 20) + 'px');
+    document.documentElement.style.setProperty('--brickWidth', (parseInt(width, 10) / 10) + 'px');
   }, [dimensions.width, dimensions.height])
 
 
@@ -90,7 +94,7 @@ export default function Home() {
           <div className="flex flex-row ">
             <div
               id="playField"
-              style={{ width: 'var(--playFieldWidth)', height: 'var(--playFieldHeight)', borderWidth: '0.2vh', boxShadow: '0 0 1rem 0rem rgba(255,255,255)' }}
+              style={{ width: 'var(--playFieldWidth)', height: 'var(--playFieldHeight)', boxSizing: 'content-box', borderWidth: '0.2vh', boxShadow: '0 0 1rem 0rem rgba(255,255,255)' }}
               // style={{ width: 'var(--playFieldWidth)', height: 'var(--playFieldHeight)', borderWidth: '0.2vh', boxShadow: '0 0 1rem 0rem rgba(255,255,255)' }}
               className=" relative bg-black box-border">
               <BasicModal />
@@ -102,9 +106,7 @@ export default function Home() {
                 <BasicModal isAIPage={true}/>
                 <PlayField AIcontrol={true} />
               </div>}
-
           </div>
-
           <RightPanel />
         </div>
       </div>

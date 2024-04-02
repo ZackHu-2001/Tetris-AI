@@ -13,7 +13,7 @@ const PlayField: React.FC<PlayFieldProps> = ({ AIcontrol }) => {
     let counted = false;
     let tetrominoCopy = [];
 
-    let gameBoard = AIcontrol ? board_AI: board;
+    let gameBoard = AIcontrol ? board_AI : board;
 
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
@@ -46,7 +46,7 @@ const PlayField: React.FC<PlayFieldProps> = ({ AIcontrol }) => {
             }
             // console.log('key pressed', event.key);
         }
-        
+
         if (!AIcontrol) {
             document.addEventListener('keydown', handleKeyDown);
         }
@@ -56,27 +56,21 @@ const PlayField: React.FC<PlayFieldProps> = ({ AIcontrol }) => {
     }, [keyBindings]);
 
     return (
-        <div  className='absolute w-full h-full top-0 left-0 z-10 flex flex-col '>
+        <div className='absolute w-full h-full top-0 left-0 z-10 flex flex-col '>
             {gameBoard.map((row, rowIndex) => {
                 counted = false;
-                // if (rowIndex < boardLength - tetrominoCopy.length){
                 return (<div style={{ height: '5%' }} className='w-full flex ' key={rowIndex}>
                     {Array.from({ length: colNum }).map((_, i) => {
+                        if (row & (1 << i)) {
+                            if (!counted) {
+                                counted = true;
+                                tetrominoCopy.push(row);
+                            }
+                        }
                         return (
                             <div className=' h-full bg-black' key={rowIndex * 10 + i}
-                                style={{
-                                    width: '10%', border: '', boxSizing: 'border-box', backgroundColor: (() => {
-                                        if (row & (1 << i)) {
-                                            if (!counted) {
-                                                counted = true;
-                                                tetrominoCopy.push(row);
-                                            }
-                                            return 'red'
-                                        } else {
-                                            return ''
-                                        }
-                                    })()
-                                }}>
+                                style={{width: '10%', border: '', boxSizing: 'border-box'}}>
+                                <div className={row & (1 << i) ? 'brick_skyBlue' : ''}></div>
                             </div>
                         )
 
