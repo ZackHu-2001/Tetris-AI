@@ -30,55 +30,32 @@ export default function Home() {
     return () => window.removeEventListener('resize', handleResize);
   }, [])
 
+  const setSize = (width: number) => {
+    const vh = dimensions.height / 100;
+    document.documentElement.style.setProperty('--bgWidth', width * 2 + 'px');
+    document.documentElement.style.setProperty('--AIModeWidth', width * 2 * 1.5 + vh * 0.2 + 'px');
+    document.documentElement.style.setProperty('--buttonWidth', width * 0.6 + 'px');
+    document.documentElement.style.setProperty('--buttonHeight', width * 0.6 / 4 + 'px');
+    document.documentElement.style.setProperty('--playFieldWidth', width * 1 + 'px');
+    document.documentElement.style.setProperty('--playFieldHeight', width * 2 + 'px');
+    document.documentElement.style.setProperty('font-size', width * 0.01 * 1.5 + 'px');
+
+  }
 
   useEffect(() => {
-    var widthIsShorter: boolean = 2 * dimensions.width < dimensions.height;
-
+    var widthIsShorter: boolean = dimensions.width < dimensions.height;
+    let width = 0;
     if (widthIsShorter) {
-      if (dimensions.width <= 600) {
-        document.documentElement.style.setProperty('--bgWidth', dimensions.width / 2 * 2 + 'px');
-        document.documentElement.style.setProperty('--AIModeWidth', dimensions.width / 2 * 2 * 1.5 + 'px');
-        document.documentElement.style.setProperty('--gutterWidth', dimensions.width / 2 * 1 * 0.2 + 'px');
-        document.documentElement.style.setProperty('--buttonWidth', dimensions.width / 2 * 0.6 + 'px');
-        document.documentElement.style.setProperty('--buttonHeight', dimensions.width / 2 * 0.6 / 4 + 'px');
-        document.documentElement.style.setProperty('--playFieldWidth', dimensions.width / 2 * 1 + 'px');
-        document.documentElement.style.setProperty('--playFieldHeight', dimensions.width / 2 * 2 + 'px');
-        document.documentElement.style.setProperty('font-size', dimensions.width / 2 * 0.01 * 1.5 + 'px');
-      } else {
-        document.documentElement.style.setProperty('--bgWidth', dimensions.width * 0.9 * 2 + 'px');
-        document.documentElement.style.setProperty('--AIModeWidth', dimensions.width * 0.9 * 2 * 1.5 + 'px');
-        document.documentElement.style.setProperty('--gutterWidth', dimensions.width * 0.9 * 1 * 0.2 + 'px');
-        document.documentElement.style.setProperty('--buttonWidth', dimensions.width * 0.9 * 0.6 + 'px');
-        document.documentElement.style.setProperty('--buttonHeight', dimensions.width * 0.9 * 0.6 / 4 + 'px');
-        document.documentElement.style.setProperty('--playFieldWidth', dimensions.width * 0.9 + 'px');
-        document.documentElement.style.setProperty('--playFieldHeight', dimensions.width * 1.8 + 'px');
-        document.documentElement.style.setProperty('font-size', dimensions.width * 0.009 * 1.5 + 'px');
-      }
+      width = dimensions.width / 2 - dimensions.width / 2 % 10;
+        setSize(width);
     } else {
-      if (dimensions.height <= 900) {
-        document.documentElement.style.setProperty('--bgWidth', dimensions.height + 'px');
-        document.documentElement.style.setProperty('--AIModeWidth', dimensions.height * 1.5 + 'px');
-        document.documentElement.style.setProperty('--gutterWidth', dimensions.height * 0.5 * 0.2 + 'px');
-        document.documentElement.style.setProperty('--buttonWidth', dimensions.height * 0.3 + 'px');
-        document.documentElement.style.setProperty('--buttonHeight', dimensions.height * 0.075 + 'px');
-        document.documentElement.style.setProperty('--playFieldWidth', dimensions.height * 0.5 + 'px');
-        document.documentElement.style.setProperty('--playFieldHeight', dimensions.height + 'px');
-        document.documentElement.style.setProperty('font-size', dimensions.height * 0.005 * 1.5 + 'px');
-      } else {
-        document.documentElement.style.setProperty('--bgWidth', dimensions.height * 0.45 * 2 + 'px');
-        document.documentElement.style.setProperty('--AIModeWidth', dimensions.height * 0.45 * 2 * 1.5 + 'px');
-        document.documentElement.style.setProperty('--gutterWidth', dimensions.height * 0.45 * 0.2 + 'px');
-        document.documentElement.style.setProperty('--buttonWidth', dimensions.height * 0.45 * 0.6 + 'px');
-        document.documentElement.style.setProperty('--buttonHeight', dimensions.height * 0.45 * 0.6 / 4 + 'px');
-        document.documentElement.style.setProperty('--playFieldWidth', dimensions.height * 0.45 + 'px');
-        document.documentElement.style.setProperty('--playFieldHeight', dimensions.height * 0.9 + 'px');
-        document.documentElement.style.setProperty('font-size', dimensions.height * 0.0045 * 1.5 + 'px');
-      }
+      width = dimensions.height * 0.5 - dimensions.height * 0.5 % 10;
+      setSize(width);
     }
+    document.documentElement.style.setProperty('--brickHalfWidth', (width / 20) + 'px');
+    document.documentElement.style.setProperty('--brickWidth', (width / 10) + 'px');
+    return;
 
-    const width = document.documentElement.style.getPropertyValue('--playFieldWidth');
-    document.documentElement.style.setProperty('--brickHalfWidth', (parseInt(width, 10) / 20) + 'px');
-    document.documentElement.style.setProperty('--brickWidth', (parseInt(width, 10) / 10) + 'px');
   }, [dimensions.width, dimensions.height])
 
 
@@ -101,7 +78,7 @@ export default function Home() {
               <PlayField AIcontrol={false} />
             </div>
             {gameState.mode === 'competition' &&
-              <div style={{ width: 'var(--playFieldWidth)', height: 'var(--playFieldHeight)', borderWidth: '0.2vh', boxShadow: '0 0 1rem 0rem rgba(255,255,255)' }}
+              <div style={{ width: 'var(--playFieldWidth)', height: 'var(--playFieldHeight)', boxSizing: 'content-box', borderWidth: '0.2vh', boxShadow: '0 0 1rem 0rem rgba(255,255,255)' }}
                 className=" relative bg-black box-border">
                 <BasicModal isAIPage={true}/>
                 <PlayField AIcontrol={true} />
