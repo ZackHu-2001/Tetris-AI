@@ -71,7 +71,7 @@ const Timer: React.FC<TimerProps> = ({ fontSize = "5rem" }) => {
     takeActionInterval = setInterval(() => {
       moveDown_AI();
     }, 50);
-    
+
     if (gameState.status == "paused" || gameState.status == "gameOver") {
       clearInterval(takeActionInterval);
     }
@@ -82,20 +82,24 @@ const Timer: React.FC<TimerProps> = ({ fontSize = "5rem" }) => {
   }, [AIready, gameState]);
 
   return (
-    <div
-      style={{ paddingLeft: "2rem", paddingRight: "2rem" }}
-      className="w-full flex "
-    >
-      {formatTime(time)
-        .split("")
-        .map((char: string, index: number) => {
-          return (
-            <div key={index} style={{ fontSize }} className="timer-char">
-              {char}
-            </div>
-          );
-        })}
-    </div>
+    <>
+      {
+        gameState.mode !== 'competition' && <div
+          style={{ paddingLeft: "2rem", paddingRight: "2rem" }}
+          className="w-full flex ">
+          {formatTime(time)
+            .split("")
+            .map((char: string, index: number) => {
+              return (
+                <div key={index} style={{ fontSize }} className="timer-char">
+                  {char}
+                </div>
+              );
+            })}
+        </div>
+      }
+    </>
+
   );
 };
 export default Timer;

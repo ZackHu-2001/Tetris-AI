@@ -181,3 +181,8 @@ body {
   border-right: var(--brickHalfWidth) solid #009e81ff;
   border-bottom: var(--brickHalfWidth) solid #018568ff;
 }
+
+.empty_brick {
+  width: var(--brickWidth);
+  height: var(--brickWidth);
+}

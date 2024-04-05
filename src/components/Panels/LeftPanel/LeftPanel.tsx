@@ -1,6 +1,5 @@
 'use client'
 import React from 'react';
-import Timer from '@/components/Timer/Timer';
 import { useGameBoard } from '../../GameBoard';
 import NextPanel from '../NextPanel/NextPanel';
 import StatusPanel from '../StatusPanel/StatusPanel';

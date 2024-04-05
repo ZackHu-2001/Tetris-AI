@@ -9,24 +9,15 @@ const TetrominoBlock = ({ filled, color, width }: { filled: boolean, color: stri
 );
 
 
-const NextTetromino = ({ tetromino, width} : {tetromino: number[], width: number}) => {
+const NextTetromino = ({ tetromino, width }: { tetromino: number[][], width: number }) => {
     const tetroColor = mapColor(tetromino);
-    const cols = mapColumn(tetromino); // Assuming a standard width for tetrominos
-    var tetrominoCopy = [];
-    for (let i = 0; i < tetromino.length; i++) {
-        if (tetromino[i] !== 0) {
-            tetrominoCopy.push(tetromino[i]);
-        }
-    }
 
     return (
         <div className='flex flex-col'>
-            {tetrominoCopy.map((row, rowIndex) => (
+            {tetromino.map((row, rowIndex) => (
                 <div key={rowIndex} className='flex'>
-                    {Array.from({ length: cols }).map((_, colIndex) => {
-                        const isFilled = !!(row & (1 << (colIndex)));
-                        return <TetrominoBlock key={colIndex} width={width} filled={isFilled} color={tetroColor} />;
-                        // Return null for empty cells, so they don't get rendered
+                    {row.map((value, index) => {
+                        return <TetrominoBlock key={index} width={width} filled={!!value} color={tetroColor} />;
                     })}
                 </div>
             ))}
@@ -43,10 +34,10 @@ const NextPanel: React.FC<NextPanelProps> = ({ nextTetrominoQueue, height }) => 
     const { gameState } = useGameBoard();
     const width = Math.floor(parseFloat(document.documentElement.style.getPropertyValue('--brickWidth')));
     return (
-        <div style={{ fontSize: '5rem', height: height + '%' }} className='flex flex-col items-center p-4'>
-            <div style={{ fontWeight: 'bold' }}>NEXT</div>
+        <div style={{ fontSize: '5rem', height: height + '%' }} className='flex flex-col items-center '>
+            { gameState.mode === 'competition' ? <></> : <div style={{ fontWeight: 'bold' }}>NEXT</div>}
 
-            <div className={`h-full py-[4rem] flex flex-col justify-between items-center`}>
+            <div className={`h-full py-[${gameState.mode === 'competition' ? 0: 4}rem] flex flex-col justify-between items-center`}>
 
                 {nextTetrominoQueue.map((tetrominoIndex, index) => (
                     index <= 6 ? <NextTetromino key={index} tetromino={pack[tetrominoIndex]} width={width} /> : null
@@ -56,49 +47,25 @@ const NextPanel: React.FC<NextPanelProps> = ({ nextTetrominoQueue, height }) => 
     );
 };
 
-function mapColor(arr: number[]) {
-    switch (arr.join('')) {
-        case '01500':
-            return 'brick_skyBlue';
-        case '470':
-            return 'brick_orange';
-        case '270':
-            return 'brick_purple';
-        case '170':
-            return 'brick_blue';
-        case '33':
-            return 'brick_yellow';
-        case '036':
-            return 'brick_red';
-        case '063':
-            return 'brick_green';
-        default:
-            return '';
-    }
-}
-
-function mapColumn(arr: number[]) {
-    switch (arr.join('')) {
-        case '01500':
-            return 4;
-        case '470':
-            return 3;
-        case '270':
-            return 3;
-        case '170':
-            return 3;
-        case '33':
-            return 2;
-        case '036':
-            return 3;
-        case '063':
-            return 3;
-        default:
-            return 0;
+function mapColor(arr: number[][]) {
+    let str = arr.join();
+    if (str.includes('7')) {
+        return `brick_blue`;
+    } else if (str.includes('6')) {
+        return 'brick_orange';
+    } else if (str.includes('5')) {
+        return 'brick_skyBlue';
+    } else if (str.includes('4')) {
+        return 'brick_red';
+    } else if (str.includes('3')) {
+        return 'brick_green';
+    } else if (str.includes('2')) {
+        return 'brick_purple';
+    } else if (str.includes('1')) {
+        return 'brick_yellow';
+    } else {
+        return '';
     }
 }
 
 export default NextPanel;
-
-
-

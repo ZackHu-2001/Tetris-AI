@@ -58,56 +58,38 @@ const PlayField: React.FC<PlayFieldProps> = ({ AIcontrol }) => {
     return (
         <div className='absolute w-full h-full top-0 left-0 z-10 flex flex-col '>
             {gameBoard.map((row, rowIndex) => {
-                counted = false;
                 return (<div style={{ height: '5%' }} className='w-full flex ' key={rowIndex}>
                     {Array.from({ length: colNum }).map((_, i) => {
-                        if (row & (1 << i)) {
-                            if (!counted) {
-                                counted = true;
-                                tetrominoCopy.push(row);
-                            }
-                        }
                         return (
-                            <div className=' h-full bg-black' key={rowIndex * 10 + i}
-                                style={{width: '10%', border: '', boxSizing: 'border-box'}}>
-                                <div className={row & (1 << i) ? 'brick_skyBlue' : ''}></div>
-                            </div>
+                            <div className={row[i] ? mapColor(row[i]) : 'empty_brick'} key={rowIndex * 10 + i}></div>
                         )
-
                     })}
                 </div>)
-            }
-                // else {
-                //     return (<div style={{height: '5%'}} className='w-full flex ' key={rowIndex}>
-                //     {Array.from({ length: colNum }).map((_, i) => {
-                //         return (
-                //             <div className=' h-full bg-black' key={rowIndex * 10 + i} 
-                //             style={{ width: '10%', border: '', boxSizing: 'border-box', backgroundColor: (()=>{
-                //                 if (row & (1 << i)){
-                //                     if (!counted){
-                //                         counted = true;
-                //                         tetrominoCopy.push(row);
-                //                     }
-                //                     return 'red'
-                //                 } else if (tetrominoCopy[rowIndex - boardLength + tetrominoCopy.length] & (1 << i)){
-                //                     return 'lightcoral'
-                //                 }
-                //                 else {
-                //                     return ''
-                //                 }
-                //             })()}}>
-                //             </div>
-                //         )
-
-                //     })}
-                // </div>)
-                // }
-                // }
-            )}
+            })}
         </div>
     )
 
 }
 
+const mapColor = (value: number) => {
+    switch (value) {
+        case 1:
+            return 'brick_yellow';
+        case 2:
+            return 'brick_purple';
+        case 3:
+            return 'brick_green';
+        case 4:
+            return 'brick_red';
+        case 5:
+            return 'brick_skyBlue';
+        case 6:
+            return 'brick_orange';
+        case 7:
+            return 'brick_blue';
+        default:
+            return '';
+    }
+}
 
 export default PlayField;

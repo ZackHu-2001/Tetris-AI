@@ -2,16 +2,16 @@ import { create } from "zustand";
 import { getDisplayNameForKey } from './Modal/Control';
 
 const generatePackCnt = 100;
-const serverAPI = 'https://18.226.187.27:8000/process';
-
+// const serverAPI = 'https://18.226.187.27:8000/process';
+const serverAPI = 'http://127.0.0.1:5001/tetris-group6/us-central1/get_next_action'
 export type GameState = {
     status: "paused" | "playing" | "gameOver" | null;
     mode: "sprint" | "competition" | "endless" | null;
     modal: "mainMenu" | "pauseMenu" | "control" | "setting" | "gameOver" | null;
     winOrLose: "win" | "lose" | null;
 };
-export type Tetromino = number[];
-export type GameBoard = number[];
+export type Tetromino = number[][];
+export type GameBoard = number[][];
 export const rowNum = 20;
 export const colNum = 10;
 export type KeyBinding = {
@@ -131,15 +131,22 @@ interface gameBoardInterface {
  * @returns
  */
 function canMoveDown(tetromino: Tetromino, state: gameBoardInterface) {
-    if (tetromino[tetromino.length - 1]) {
+    if (!tetromino[tetromino.length - 1].every(val => val === 0)) {
         return false;
     }
+    const newTetromino = tetromino.slice(0, -1);
+    newTetromino.unshift(Array(colNum).fill(0));
 
-    const newTetromino = [0].concat(tetromino.slice(0, -1));
+    // const newTetromino = [0].concat(tetromino.slice(0, -1));
     for (let i = 0; i < tetromino.length; i++) {
-        if (state.gameBoard[i] & newTetromino[i]) {
-            return false;
+        for (let j = 0; j < colNum; j++) {
+            if (state.gameBoard[i][j] && newTetromino[i][j]) {
+                return false;
+            }
         }
+        // if (state.gameBoard[i] & newTetromino[i]) {
+        //     return false;
+        // }
     }
     return true;
 }
@@ -153,7 +160,10 @@ const getDropPosition = (state: gameBoardInterface): Tetromino => {
     let nextPosition: Tetromino = [...state.fallingTetromino];
 
     while (canMoveDown(nextPosition, state)) {
-        nextPosition = [0].concat(nextPosition.slice(0, -1));
+        // nextPosition = [0].concat(nextPosition.slice(0, -1));
+
+        nextPosition = nextPosition.slice(0, -1);
+        nextPosition.unshift(Array(colNum).fill(0));
     }
     return nextPosition;
 };
@@ -181,15 +191,17 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
         // initialize fallingTetromino
         const NextTetromino = get().pop();
+        console.log('NextTetromino', NextTetromino)
         get().setFallingTetromino(NextTetromino);
 
         get().updateBoard();
+        // console.log(get().board)
 
         if (get().gameState.mode === 'competition') {
 
             // clear AI's response queue
             set({ AIresponseQueue: [] });
-        
+
             let dataToSend = {
                 'nextTetrominoQueueAI': get().nextTetrominoQueue_AI,
                 'gameBoard': new Array(rowNum).fill(0),
@@ -214,8 +226,9 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                 console.log(data)
                 get().setAIready(true)
             })
-    
-            get().updateAIBoard();
+
+            // console.log("falling tetromino", get().fallingTetromino_AI.slice())
+            // get().updateAIBoard();
         }
     },
 
@@ -261,9 +274,12 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
     updateBoard: () => {
         set((state) => {
-            const newBoard: GameBoard = [];
+            const newBoard: GameBoard = Array(rowNum).fill(undefined).map(() => Array(colNum).fill(0));
             for (let i = 0; i < rowNum; i++) {
-                newBoard[i] = state.gameBoard[i] | state.fallingTetromino[i];
+                for (let j = 0; j < colNum; j++) {
+                    newBoard[i][j] = state.gameBoard[i][j] | state.fallingTetromino[i][j];
+                }
+                // newBoard[i] = state.gameBoard[i] | state.fallingTetromino[i];
             }
             return { board: newBoard };
         });
@@ -273,9 +289,12 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     // TODO add tetromino to game board
     addTetromino: (tetromino) => {
         set((state) => {
-            const newGameBoard: number[] = Array(rowNum).fill(0);
+            const newGameBoard: number[][] = Array(rowNum).fill(undefined).map(() => Array(colNum).fill(0));
             for (let i = 0; i < tetromino.length; i++) {
-                newGameBoard[i] = state.gameBoard[i] | tetromino[i];
+                for (let j = 0; j < colNum; j++) {
+                    newGameBoard[i][j] = state.gameBoard[i][j] | tetromino[i][j];
+
+                }
             }
 
             return { gameBoard: newGameBoard };
@@ -285,7 +304,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
     initializeGameBoard: () => {
         set((state) => {
-            return { gameBoard: Array(rowNum).fill(0), gameBoard_AI: Array(rowNum).fill(0)};
+            return { gameBoard: Array(rowNum).fill(0).map(() => Array(colNum).fill(0)), gameBoard_AI: Array(rowNum).fill(0).map(() => Array(colNum).fill(0)) };
         });
     },
 
@@ -294,16 +313,30 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     setFallingTetromino: (tetromino: GameBoard) => {
         const tetrominoCopy: GameBoard = [];
         for (const row of tetromino) {
-            if (row !== 0) {
-                tetrominoCopy.push(row);
+            let toPush = true;
+            if (row.every((brick) => brick === 0)) {
+                toPush = false;
+            }
+            if (toPush) {
+                tetrominoCopy.push(row.map((brick) => brick));
             }
         }
-        for (let i = 0; i < tetromino.length; i++) {
-            tetrominoCopy[i] = tetrominoCopy[i] << 3;
+
+
+        // here might have problem, initialy i < tetromino.length
+        for (let i = 0; i < tetrominoCopy.length; i++) {
+            tetrominoCopy[i] = [0, 0, 0].concat(tetrominoCopy[i])
+            while (tetrominoCopy[i].length < colNum) {
+                tetrominoCopy[i].push(0)
+            }
+            // tetrominoCopy[i] = tetrominoCopy[i] << 3;
         }
+        // for (const row of tetrominoCopy) {
+        //     console.log(row)
+        // }
         set({
             fallingTetromino: tetrominoCopy.concat(
-                Array(20 - tetrominoCopy.length).fill(0)
+                Array(20 - tetrominoCopy.length).fill(0).map(() => Array(colNum).fill(0))
             ),
         });
     },
@@ -315,26 +348,34 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
             // first check if attach the wall
             state.fallingTetromino.map((row) => {
-                if (row & 1) {
+                if (row[0] && 1) {
                     canMove = false;
                 }
             });
 
             // then check if attach the game board
             const fallingTetrominoCopy = state.fallingTetromino.map((row) => {
-                return row >> 1;
+                row = row.slice(1).concat(0);
+                return row;
+                // return row >> 1;
             });
 
             for (let i = 0; i < fallingTetrominoCopy.length; i++) {
-                if (state.gameBoard[i] & fallingTetrominoCopy[i]) {
-                    canMove = false;
+                for (let j = 0; j < colNum; j++) {
+                    if (state.gameBoard[i][j] && fallingTetrominoCopy[i][j]) {
+                        canMove = false;
+                    }
                 }
+                // if (state.gameBoard[i] & fallingTetrominoCopy[i]) {
+                //     canMove = false;
+                // }
             }
 
             if (canMove) {
                 get().setOffSet([get().offSet[0] - 1, get().offSet[1]]);
                 const newTetromino = state.fallingTetromino.map((row) => {
-                    row = row >> 1;
+                    row = row.slice(1).concat(0);
+                    // row = row >> 1;
                     return row;
                 });
                 return { fallingTetromino: newTetromino };
@@ -351,27 +392,39 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
             // first check if attach the wall
             state.fallingTetromino.map((row) => {
-                if (row & (1 << 9)) {
+                if (row[9]) {
                     canMove = false;
                 }
+                // if (row & (1 << 9)) {
+                //     canMove = false;
+                // }
             });
 
             // then check if attach the game board
             const fallingTetrominoCopy = state.fallingTetromino.map((row) => {
-                return row << 1;
+                row = [0].concat(row.slice(0, -1));
+                return row;
+                // return row << 1;
             });
 
             for (let i = 0; i < fallingTetrominoCopy.length; i++) {
-                if (state.gameBoard[i] & fallingTetrominoCopy[i]) {
-                    canMove = false;
+                for (let j = 0; j < colNum; j++) {
+                    if (state.gameBoard[i][j] && fallingTetrominoCopy[i][j]) {
+                        canMove = false;
+                    }
                 }
+                // if (state.gameBoard[i] & fallingTetrominoCopy[i]) {
+                //     canMove = false;
+                // }
             }
+
 
             if (canMove) {
                 get().setOffSet([get().offSet[0] + 1, get().offSet[1]]);
 
                 const newTetromino = state.fallingTetromino.map((row) => {
-                    row = row << 1;
+                    row = [0].concat(row.slice(0, -1));
+                    // row = row << 1;
                     return row;
                 });
                 return { fallingTetromino: newTetromino };
@@ -385,15 +438,28 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     moveDown: () => {
         set((state) => {
             function canMoveDown() {
-                if (state.fallingTetromino[state.fallingTetromino.length - 1]) {
+                if (!state.fallingTetromino[state.fallingTetromino.length - 1].every(val => val === 0)) {
+                    console.log('can not move down 1')
                     return false;
                 }
 
-                const newTetromino = [0].concat(state.fallingTetromino.slice(0, -1));
+                let newTetromino = get().fallingTetromino.map((row) => {
+                    return row.slice();
+                })
+                newTetromino.unshift(Array(colNum).fill(0));
+                newTetromino = newTetromino.slice(0, -1);
+                //  = get().fallingTetromino.unshift(Array(colNum).fill(0));
+                // const newTetromino = [0].concat(state.fallingTetromino.slice(0, -1));
                 for (let i = 0; i < state.fallingTetromino.length; i++) {
-                    if (state.gameBoard[i] & newTetromino[i]) {
-                        return false;
+                    for (let j = 0; j < colNum; j++) {
+                        if (state.gameBoard[i][j] && newTetromino[i][j]) {
+                            console.log('can not move down')
+                            return false;
+                        }
                     }
+                    // if (state.gameBoard[i] & newTetromino[i]) {
+                    //     return false;
+                    // }
                 }
                 return true;
             }
@@ -402,8 +468,14 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             if (canMoveDown()) {
                 get().setOffSet([get().offSet[0], get().offSet[1] + 1]);
 
+                let newTetromino = get().fallingTetromino.map((row) => {
+                    return row.slice();
+                })
+                newTetromino.unshift(Array(colNum).fill(0));
+                newTetromino = newTetromino.slice(0, -1);
                 return {
-                    fallingTetromino: [0].concat(state.fallingTetromino.slice(0, -1)),
+                    fallingTetromino: newTetromino,
+                    // fallingTetromino: [0].concat(state.fallingTetromino.slice(0, -1)),
                 };
             } else {
                 // TODO handle attach
@@ -448,6 +520,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         set({ fallingShape: rotatedShape });
 
         const destination = moveTo(get().fallingShape, get(), get().offSet);
+
         set({ fallingTetromino: destination });
         get().updateBoard();
     },
@@ -463,16 +536,19 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
     fallingShape: [] as Tetromino,
     setFallingShape: (tetromino: Tetromino) => {
+        const tetrominoCopy: Tetromino = tetromino.map((row) => row.map((brick) => brick));
         for (let i = 0; i < 3; i++) {
             get().setOffSet([get().offSet[0] + 1, get().offSet[1]]);
         }
         let i = 0;
-        while (tetromino[i] === 0) {
+
+        while (tetrominoCopy[i].every((val) => val === 0)) {
+            // while (tetromino[i] === 0) {
             i++;
             get().setOffSet([get().offSet[0], get().offSet[1] - 1]);
         }
 
-        set({ fallingShape: tetromino });
+        set({ fallingShape: tetrominoCopy });
     },
 
     offSet: [0, 0] as number[],
@@ -512,7 +588,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             get().addPack();
         }
 
-        const popedValue = pack[get().nextTetrominoQueue[0]];
+        const popedValue = pack[get().nextTetrominoQueue[0]].map((row) => row.slice());
         get().setFallingShape(popedValue);
         get().setOffSet([3, 0]);
         set((state) => ({
@@ -525,10 +601,9 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         if (get().nextTetrominoQueue_AI.length <= 6) {
             get().addPack();
         }
-
-        const popedValue = pack[get().nextTetrominoQueue_AI[0]];
+        
+        const popedValue = pack[get().nextTetrominoQueue_AI[0]].map((row) => row.slice());
         get().setFallingShape_AI(popedValue);
-        // get().setOffSet([3, 0]);
         set((state) => ({
             nextTetrominoQueue_AI: get().nextTetrominoQueue_AI.slice(1),
         }));
@@ -572,9 +647,11 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         // clear line first
         var cnt = 0;
         for (let i = 0; i < rowNum; i++) {
-            if (get().gameBoard[i] === 1023) {
+            if (get().gameBoard[i].every(val => val !== 0)) {
+                // if (get().gameBoard[i] === 1023) {
                 get().gameBoard.splice(i, 1);
-                get().gameBoard.unshift(0);
+                get().gameBoard.unshift(Array(colNum).fill(0));
+                // get().gameBoard.unshift(0);
                 cnt += 1;
             }
         }
@@ -595,11 +672,12 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             get().setStatus("gameOver");
             get().setModal("gameOver");
             get().setWinOrLose("win");
-            console.log("win")
+            // console.log("win")
         }
 
         // check if the top line is full
-        if (get().gameBoard[0] !== 0 || get().gameBoard[1] !== 0) {
+        if (!get().gameBoard[0].every(val => val === 0) || !get().gameBoard[1].every(val => val === 0)) {
+            // if (get().gameBoard[0] !== 0 || get().gameBoard[1] !== 0) {
             get().setStatus("gameOver");
             get().setModal("gameOver");
             get().setWinOrLose("lose");
@@ -646,11 +724,12 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
     gameBoard_AI: [],
     addTetromino_AI: (tetromino) => {
-        // console.log(tetromino)
         set((state) => {
-            const newGameBoard: number[] = Array(rowNum).fill(0);
+            const newGameBoard: number[][] = Array(rowNum).fill(0).map(() => Array(colNum).fill(0));
             for (let i = 0; i < tetromino.length; i++) {
-                newGameBoard[i] = state.gameBoard_AI[i] | tetromino[i];
+                for (let j = 0; j < colNum; j++) {
+                    newGameBoard[i][j] = state.gameBoard_AI[i][j] || tetromino[i][j];
+                }
             }
 
             return { gameBoard_AI: newGameBoard };
@@ -661,9 +740,11 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     board_AI: [],
     updateAIBoard: () => {
         set((state) => {
-            const newBoard: GameBoard = [];
+            const newBoard: GameBoard = Array(rowNum).fill(undefined).map(() => Array(colNum).fill(0));
             for (let i = 0; i < rowNum; i++) {
-                newBoard[i] = state.gameBoard_AI[i] | state.fallingTetromino_AI[i];
+                for (let j = 0; j < colNum; j++) {
+                    newBoard[i][j] = state.gameBoard_AI[i][j] || state.fallingTetromino_AI[i][j];
+                }
             }
             return { board_AI: newBoard };
         });
@@ -680,23 +761,26 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     setFallingTetromino_AI: (tetromino: Tetromino) => {
         const tetrominoCopy: GameBoard = [];
         for (const row of tetromino) {
-            if (row !== 0) {
+            if (!row.every((val) => val === 0)) {
+                while (row.length < colNum) {
+                    row.push(0);
+                }
                 tetrominoCopy.push(row);
             }
         }
         set({
             fallingTetromino_AI: tetrominoCopy.concat(
-                Array(20 - tetrominoCopy.length).fill(0)
+                Array(20 - tetrominoCopy.length).fill(0).map(() => Array(colNum).fill(0))
             ),
         });
-        // console.log("set falling", get().fallingTetromino_AI)
     },
 
     moveRight_AI: () => {
         set((state) => {
             let canMove = true;
             state.fallingTetromino_AI.map((row) => {
-                if (row & (1 << 9)) {
+                if (row[9]) {
+                    // if (row & (1 << 9)) {
                     canMove = false;
                 }
             });
@@ -704,7 +788,8 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                 get().setAIOffSet([get().offSet_AI[0] + 1, get().offSet_AI[1]]);
 
                 const newTetromino = state.fallingTetromino_AI.map((row) => {
-                    row = row << 1;
+                    row = [0].concat(row.slice(0, -1));
+                    // row = row << 1;
                     return row;
                 });
                 return { fallingTetromino_AI: newTetromino };
@@ -712,20 +797,27 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                 return { fallingTetromino_AI: state.fallingTetromino_AI };
             }
         });
-
+        console.log('move right')
         get().updateAIBoard();
     },
 
     canMoveDown_AI: () => {
 
-        if (get().fallingTetromino_AI[get().fallingTetromino_AI.length - 1]) {
+        if (!get().fallingTetromino_AI[get().fallingTetromino_AI.length - 1].every(val => val === 0)) {
             return false;
         }
-
-        const newTetromino = [0].concat(get().fallingTetromino_AI.slice(0, -1));
+        const newTetromino = get().fallingTetromino_AI.slice(0, -1);
+        // let newTetromino = get().fallingTetromino_AI.map((row) => {
+        //     return row.slice();
+        // })
+        newTetromino.unshift(Array(colNum).fill(0));
+        // newTetromino = newTetromino.slice(0, -1);
+        // const newTetromino = [0].concat(get().fallingTetromino_AI.slice(0, -1));
         for (let i = 0; i < get().fallingTetromino_AI.length; i++) {
-            if (get().gameBoard_AI[i] & newTetromino[i]) {
-                return false;
+            for (let j = 0; j < colNum; j++) {
+                if (get().gameBoard_AI[i][j] && newTetromino[i][j]) {
+                    return false;
+                }
             }
         }
         return true;
@@ -734,7 +826,12 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     moveDown_AI: () => {
         if (get().canMoveDown_AI()) {
             get().setAIOffSet([get().offSet[0], get().offSet[1] + 1]);
-            set({ fallingTetromino_AI: [0].concat(get().fallingTetromino_AI.slice(0, -1)) });
+            let newTetromino = get().fallingTetromino_AI.map((row) => {
+                return row.slice();
+            })
+            newTetromino.unshift(Array(colNum).fill(0));
+            newTetromino = newTetromino.slice(0, -1);
+            set({ fallingTetromino_AI: newTetromino });
         } else {
             // TODO handle attach
 
@@ -748,11 +845,9 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             get().checkAndClearLines_AI();
 
             // update next action for AI
-            console.log("update next action in move down")
             console.log("len of response queue", get().AIresponseQueue.length)
             console.log("len of action queue", get().nextTetrominoQueue_AI.length)
             get().updateAInextAction()
-            // console.log(get().fallingTetromino_AI)
         }
         get().updateAIBoard();
     },
@@ -768,13 +863,15 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
     fallingShape_AI: [] as Tetromino,
     setFallingShape_AI: (tetromino: Tetromino) => {
+        const tetrominoCopy: GameBoard = tetromino.map((row) => row.map((brick) => brick));
         let i = 0;
-        while (tetromino[i] === 0) {
+        while (tetrominoCopy[i].every((val) => val === 0)) {
+            // while (tetromino[i] === 0) {
             i++;
             get().setAIOffSet([get().offSet_AI[0], get().offSet_AI[1] - 1]);
         }
 
-        set((state) => { return { fallingShape_AI: tetromino } });
+        set((state) => { return { fallingShape_AI: tetrominoCopy } });
 
     },
 
@@ -788,16 +885,15 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     AIresponseQueue: [],
 
     appendAIResponse: (response: number[]) => {
-        console.log(get().AIresponseQueue)
+        // console.log(get().AIresponseQueue)
         set((state) => {
             return { AIresponseQueue: state.AIresponseQueue.concat(response) };
         });
-        console.log(get().AIresponseQueue)
+        // console.log(get().AIresponseQueue)
 
     },
 
     updateAInextAction: () => {
-
         // if the action's length is shorter than the buffer size, fetch new actions
         const bufferSize = 70;
 
@@ -829,10 +925,13 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                 get().setWaitingForAI(false);
             })
         }
+        const tmp = get().popFromAIQueue();
 
         // pop the next element
-        get().setFallingTetromino_AI(get().popFromAIQueue());
-
+        get().setFallingTetromino_AI(tmp);
+        // for (const row of get().fallingTetromino_AI) {
+        //     console.log(row.slice())
+        // }
         const action = get().AIresponseQueue[0];
 
         set((state) => {
@@ -854,7 +953,8 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         let leftShift = 0;
         while (shouldMoveLeft) {
             for (let i = 0; i < get().fallingShape_AI.length; i++) {
-                if (get().fallingShape_AI[i] & (1 << leftShift)) {
+                if (get().fallingShape_AI[i][leftShift]) {
+                    // if (get().fallingShape_AI[i] & (1 << leftShift)) {
                     shouldMoveLeft = false;
                     break;
                 }
@@ -867,14 +967,37 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         get().setAIOffSet([action[0] - leftShift, get().offSet_AI[1]]);
 
         const copy = [];
+        for (const row of get().fallingShape_AI) {
+            while (row.length < colNum) {
+                row.push(0);
+            }
+            copy.push(row);
+        }
         for (let i = 0; i < get().fallingShape_AI.length; i++) {
             if (get().offSet_AI[0] < 0) {
-                copy.push(get().fallingShape_AI[i] >> -get().offSet_AI[0])
+                for (let j = 0; j < -get().offSet_AI[0]; j++) {
+                    copy[i].shift();
+                    copy[i].push(0);
+                    // get().fallingShape_AI[i].pop();
+                    // get().fallingShape_AI[i].unshift(0);
+                }
+                // copy.push(get().fallingShape_AI[i]);
+                // copy.push(get().fallingShape_AI[i] >> -get().offSet_AI[0])
             } else {
-                copy.push(get().fallingShape_AI[i] << get().offSet_AI[0]);
+                for (let j = 0; j < get().offSet_AI[0]; j++) {
+                    copy[i].pop();
+                    copy[i].unshift(0);
+                    // get().fallingShape_AI[i].shift();
+                    // get().fallingShape_AI[i].push(0);
+                }
+                // copy.push(get().fallingShape_AI[i]);
+
+                // copy.push(get().fallingShape_AI[i] << get().offSet_AI[0]);
             }
         }
-        set({ fallingTetromino_AI: copy.concat(Array(20 - copy.length).fill(0)) })
+        // console.log('copy', copy)
+        set({ fallingTetromino_AI: copy.concat(Array(20 - copy.length).fill(0).map(() => Array(colNum).fill(0))) })
+
         get().updateAIBoard();
     },
 
@@ -905,11 +1028,24 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         // clear line first
         var cnt = 0;
         for (let i = 0; i < rowNum; i++) {
-            if (get().gameBoard_AI[i] === 1023) {
-                get().gameBoard_AI.splice(i, 1);
-                get().gameBoard_AI.unshift(0);
-                cnt += 1;
+            let canClear = true;
+            for (let j = 0; j < colNum; j++) {
+                if (get().gameBoard_AI[i][j] === 0) {
+                    canClear = false;
+                    break;
+                }
             }
+            if (canClear) {
+                get().gameBoard_AI.splice(i, 1);
+                get().gameBoard_AI.unshift(Array(colNum).fill(0));
+                cnt += 1;
+
+            }
+            // if (get().gameBoard_AI[i] === 1023) {
+            //     get().gameBoard_AI.splice(i, 1);
+            //     get().gameBoard_AI.unshift(0);
+            //     cnt += 1;
+            // }
         }
 
         // according to the lines cleared, update the score
@@ -919,23 +1055,31 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         get().setLines_AI(get().lines_AI + cnt);
 
         // check if the top line is full
-        if (get().gameBoard[0] !== 0 || get().gameBoard[1] !== 0) {
-            get().setStatus("gameOver");
-            get().setModal("gameOver");
-            get().setWinOrLose("lose");
+        for (let i = 0; i < colNum; i++) {
+            if (get().gameBoard[0][i] !== 0 || get().gameBoard[1][i] !== 0) {
+                get().setStatus("gameOver");
+                get().setModal("gameOver");
+                get().setWinOrLose("lose");
+            }
         }
+        // if (get().gameBoard[0] !== 0 || get().gameBoard[1] !== 0) {
+        //     get().setStatus("gameOver");
+        //     get().setModal("gameOver");
+        //     get().setWinOrLose("lose");
+        // }
     },
 }));
 
-function rotate(tetromino: number[], direction: number) {
+function rotate(tetromino: number[][], direction: number) {
     const n = tetromino.length;
-    const newTetromino = Array(n).fill(0);
+    const newTetromino = Array(n).fill(0).map(() => Array(n).fill(0));
     if (direction > 0) {
         for (let i = 0; i < n; i++) {
             for (let j = 0; j < n; j++) {
                 const x = j;
                 const y = n - 1 - i;
-                newTetromino[x] |= ((tetromino[i] >> j) & 1) << y;
+                newTetromino[x][y] = tetromino[i][j];
+                // newTetromino[x] |= ((tetromino[i] >> j) & 1) << y;
             }
         }
     } else {
@@ -943,7 +1087,10 @@ function rotate(tetromino: number[], direction: number) {
             for (let j = 0; j < n; j++) {
                 const x = n - 1 - j;
                 const y = i;
-                newTetromino[x] |= ((tetromino[i] >> j) & 1) << y;
+                // console.log(tetromino[i][j])
+
+                newTetromino[x][y] = tetromino[i][j];
+                // newTetromino[x] |= ((tetromino[i] >> j) & 1) << y;
             }
         }
     }
@@ -955,14 +1102,17 @@ function moveTo(
     state: gameBoardInterface,
     offSet: number[]
 ): Tetromino {
-    var tetrominoCopy: Tetromino = tetromino;
-    // var tetrominoCopy = tetromino.map((row) => row << offSet[0]);
+    const tetrominoCopy = [];
+    for (const row of tetromino) {
+        tetrominoCopy.push(row.slice());
+    }
 
     if (offSet[0] > 0) {
         for (let i = 0; i < offSet[0]; i++) {
             let canMove = true;
             for (let row of tetrominoCopy) {
-                if (row >= 512) {
+                if (row[9]) {
+                    // if (row >= 512) {
                     canMove = false;
                     break;
                 }
@@ -971,13 +1121,16 @@ function moveTo(
                 state.setOffSet([i, state.offSet[1]]);
                 break;
             }
-            tetrominoCopy = tetrominoCopy.map((row) => row << 1);
+            for (const row of tetrominoCopy) {
+                row.unshift(0);
+            }
         }
     } else {
         for (let i = 0; i > offSet[0]; i--) {
             let canMove = true;
             for (let row of tetrominoCopy) {
-                if (row & 1) {
+                if (row[0]) {
+                    // if (row & 1) {
                     canMove = false;
                     break;
                 }
@@ -986,22 +1139,43 @@ function moveTo(
                 state.setOffSet([i, state.offSet[1]]);
                 break;
             }
-            tetrominoCopy = tetrominoCopy.map((row) => row >> 1);
+            for (const row of tetrominoCopy) {
+                row.shift();
+            }
+        }
+        // return tetrominoCopy;
+    }
+    for (const row of tetrominoCopy) {
+        while (row.length < 10) {
+            row.push(0);
         }
     }
 
     for (let i = 0; i < offSet[1]; i++) {
-        tetrominoCopy = [0].concat(tetrominoCopy);
+        tetrominoCopy.unshift(Array(colNum).fill(0));
+        // tetrominoCopy = Array(colNum).fill(0).concat(tetrominoCopy);
+        // tetrominoCopy = [0].concat(tetrominoCopy);
     }
 
+    while (tetrominoCopy.length > 20) {
+        var tmp = tetrominoCopy.pop();
+        if (tmp === undefined) {
+            throw new Error("tmp is undefined");
+        }
+        if (tmp.every(value => value === 0)) {
+            // while (tmp === 0) {
+            tmp = tetrominoCopy.pop();
+        }
+    }
     // remove sufix zeros
     if (tetrominoCopy.length > 20) {
         var tmp = tetrominoCopy.pop();
-        while (tmp === 0) {
+        while (tmp?.every(value => value === 0)) {
+            // while (tmp === 0) {
             tmp = tetrominoCopy.pop();
         }
 
-        if (tmp !== undefined) {
+        if (tmp !== undefined && !tmp.every(value => value === 0)) {
             tetrominoCopy.push(tmp);
         }
     }
@@ -1009,35 +1183,27 @@ function moveTo(
     // if after removed sufix zeros still length greater than 20 then do something extra
     if (tetrominoCopy.length > 20) {
         var extraLength = tetrominoCopy.length - 20;
-        tetrominoCopy = tetrominoCopy.slice(extraLength);
+        tetrominoCopy.splice(0, extraLength);
+        // tetrominoCopy = tetrominoCopy.slice(extraLength);
     }
 
-    const sufixZero = 20 - tetrominoCopy.length;
-    for (let i = 0; i < sufixZero; i++) {
-        tetrominoCopy = tetrominoCopy.concat([0]);
+    const sufixZeroCnt = 20 - tetrominoCopy.length;
+    for (let i = 0; i < sufixZeroCnt; i++) {
+        tetrominoCopy.push(Array(colNum).fill(0));
+        // tetrominoCopy = tetrominoCopy.concat([0]);
     }
 
     return tetrominoCopy;
 }
 
-export const tetrominos: Record<string, Tetromino> = {
-    I: [0, 15, 0, 0],
-    J: [4, 7, 0],
-    L: [1, 7, 0],
-    O: [3, 3],
-    S: [0, 3, 6],
-    T: [2, 7, 0],
-    Z: [0, 6, 3],
-};
-
 export const pack = [
-    [3, 3],
-    [2, 7, 0],
-    [0, 6, 3],
-    [0, 3, 6],
-    [0, 15, 0, 0],
-    [4, 7, 0],
-    [1, 7, 0],
+    [[1, 1], [1, 1]],
+    [[0, 2, 0], [2, 2, 2], [0, 0, 0]],
+    [[0, 0, 0], [0, 3, 3], [3, 3, 0]],
+    [[0, 0, 0], [4, 4, 0], [0, 4, 4]],
+    [[0, 0, 0, 0], [5, 5, 5, 5], [0, 0, 0, 0], [0, 0, 0, 0]],
+    [[0, 0, 6], [6, 6, 6], [0, 0, 0]],
+    [[7, 0, 0], [7, 7, 7], [0, 0, 0]],
 ];
 
 // generate 10 pack of tetromino, return the indexs of those tetromino
