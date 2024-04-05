@@ -6,7 +6,8 @@ type PlayFieldProps = {
 };
 
 const PlayField: React.FC<PlayFieldProps> = ({ AIcontrol }) => {
-    const { setStatus, setModal, board, board_AI, setAIready, moveDown, moveLeft, moveRight, drop, clockWiseRotate, anticlockWiseRotate, keyBindings } = useGameBoard()
+    const { setStatus, setModal, board, board_AI, setAIready, moveDown, moveLeft, moveRight, 
+        fallingTetromino, drop, clockWiseRotate, anticlockWiseRotate, keyBindings } = useGameBoard()
     const rowNum = 20;
     const colNum = 10;
     const boardLength = Object.keys(board).length;
@@ -87,6 +88,8 @@ const mapColor = (value: number) => {
             return 'brick_orange';
         case 7:
             return 'brick_blue';
+        case 8:
+            return 'brick_gray';
         default:
             return '';
     }

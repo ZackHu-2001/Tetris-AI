@@ -37,7 +37,7 @@ const NextPanel: React.FC<NextPanelProps> = ({ nextTetrominoQueue, height }) => 
         <div style={{ fontSize: '5rem', height: height + '%' }} className='flex flex-col items-center '>
             { gameState.mode === 'competition' ? <></> : <div style={{ fontWeight: 'bold' }}>NEXT</div>}
 
-            <div className={`h-full py-[${gameState.mode === 'competition' ? 0: 4}rem] flex flex-col justify-between items-center`}>
+            <div className={`h-full ${gameState.mode === 'competition' ? '': 'py-16'} flex flex-col justify-between items-center `}>
 
                 {nextTetrominoQueue.map((tetrominoIndex, index) => (
                     index <= 6 ? <NextTetromino key={index} tetromino={pack[tetrominoIndex]} width={width} /> : null
