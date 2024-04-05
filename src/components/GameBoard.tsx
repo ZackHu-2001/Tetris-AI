@@ -3,7 +3,9 @@ import { getDisplayNameForKey } from './Modal/Control';
 
 const generatePackCnt = 100;
 // const serverAPI = 'https://18.226.187.27:8000/process';
-const serverAPI = 'http://127.0.0.1:5001/tetris-group6/us-central1/get_next_action'
+// const serverAPI = 'http://127.0.0.1:5001/tetris-group6/us-central1/get_next_action'
+const serverAPI = 'https://api.zackhu.com/process'
+
 export type GameState = {
     status: "paused" | "playing" | "gameOver" | null;
     mode: "sprint" | "competition" | "endless" | null;
@@ -191,7 +193,6 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         get().setFallingTetromino(NextTetromino);
 
         get().updateBoard();
-        // console.log(get().board)
 
         if (get().gameState.mode === 'competition') {
 
@@ -273,7 +274,6 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                 for (let j = 0; j < colNum; j++) {
                     newBoard[i][j] = state.gameBoard[i][j] || state.fallingTetromino[i][j] || ghost[i][j];
                 }
-                console.log(newBoard[i].slice())
             }
             return { board: newBoard };
         });
