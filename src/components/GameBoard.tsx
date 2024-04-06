@@ -122,6 +122,9 @@ interface gameBoardInterface {
     setLines_AI: (lines: number) => void;
     addScore_AI: (linesCleared: number) => void;
     checkAndClearLines_AI: () => void;
+    
+    width: number;
+    setWidth: (width: number) => void;
 }
 
 /**
@@ -970,6 +973,12 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             get().setWinOrLose("win");
         }
     },
+
+    width: 0,
+    setWidth: (width: number) => {
+        set({ width });
+    }
+    
 }));
 
 function rotate(tetromino: number[][], direction: number) {

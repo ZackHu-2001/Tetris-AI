@@ -31,8 +31,7 @@ type NextPanelProps = {
 };
 
 const NextPanel: React.FC<NextPanelProps> = ({ nextTetrominoQueue, height }) => {
-    const { gameState } = useGameBoard();
-    const width = Math.floor(parseFloat(document.documentElement.style.getPropertyValue('--brickWidth')));
+    const { gameState, width } = useGameBoard();
     return (
         <div style={{ fontSize: '5rem', height: height + '%' }} className='flex flex-col items-center '>
             { gameState.mode === 'competition' ? <></> : <div style={{ fontWeight: 'bold' }}>NEXT</div>}
@@ -40,7 +39,7 @@ const NextPanel: React.FC<NextPanelProps> = ({ nextTetrominoQueue, height }) => 
             <div className={`h-full ${gameState.mode === 'competition' ? '': 'py-16'} flex flex-col justify-between items-center `}>
 
                 {nextTetrominoQueue.map((tetrominoIndex, index) => (
-                    index <= 6 ? <NextTetromino key={index} tetromino={pack[tetrominoIndex]} width={width} /> : null
+                    index <= 6 ? <NextTetromino key={index} tetromino={pack[tetrominoIndex]} width={width/10} /> : null
                 ))}
             </div>
         </div>
