@@ -6,12 +6,12 @@ import StatusPanel from "../StatusPanel/StatusPanel";
 type RightPanelProps = {};
 
 const RightPanel: React.FC<RightPanelProps> = () => {
-    const { gameState, nextTetrominoQueue, nextTetrominoQueue_AI, fallingTetromino_AI, offSet_AI, board_AI } = useGameBoard();
+    const { gameState, nextTetrominoQueue_AI } = useGameBoard();
     return (
         <>
             {gameState.mode === 'competition' ?
-                <div style={{ width: '16.5%' }}>
-                    <NextPanel nextTetrominoQueue={nextTetrominoQueue_AI} height={75}/>
+                <div style={{ width: '16.5%' }} >
+                    <NextPanel nextTetrominoQueue={nextTetrominoQueue_AI} height={77}/>
                     <StatusPanel AIcontrol={true}/>
                 </div>
                 :

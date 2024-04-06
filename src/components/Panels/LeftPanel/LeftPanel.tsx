@@ -14,7 +14,7 @@ const LeftPanel: React.FC<LeftPanelProps> = () => {
         <>
             {gameState.mode === 'competition' ?
                 <div style={{ width: '16.5%', height: '100%' }}>
-                    <NextPanel nextTetrominoQueue={nextTetrominoQueue} height={75}/>
+                    <NextPanel nextTetrominoQueue={nextTetrominoQueue} height={77}/>
                     <StatusPanel />
                 </div>
                 :
