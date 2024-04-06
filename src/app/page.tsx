@@ -12,7 +12,7 @@ export default function Home() {
     height: typeof window !== 'undefined' ? window.innerHeight : 0
   })
 
-  const { gameState } = useGameBoard();
+  const { gameState, setWidth } = useGameBoard();
 
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function Home() {
 
     return () => window.removeEventListener('resize', handleResize);
   }, [])
-
+  
   const setSize = (width: number) => {
     const vh = dimensions.height / 100;
     document.documentElement.style.setProperty('--bgWidth', width * 2 + 'px');
@@ -39,19 +39,20 @@ export default function Home() {
     document.documentElement.style.setProperty('--playFieldWidth', width * 1 + 'px');
     document.documentElement.style.setProperty('--playFieldHeight', width * 2 + 'px');
     document.documentElement.style.setProperty('font-size', width * 0.01 * 1.5 + 'px');
-
   }
 
   useEffect(() => {
+    
     var widthIsShorter: boolean = dimensions.width < dimensions.height;
     let width = 0;
     if (widthIsShorter) {
       width = dimensions.width / 2 - dimensions.width / 2 % 10;
-        setSize(width);
+      setSize(width);
     } else {
       width = dimensions.height * 0.5 - dimensions.height * 0.5 % 10;
       setSize(width);
     }
+    setWidth(width);
     document.documentElement.style.setProperty('--brickHalfWidth', (width / 20) + 'px');
     document.documentElement.style.setProperty('--brickWidth', (width / 10) + 'px');
     return;
@@ -80,7 +81,7 @@ export default function Home() {
             {gameState.mode === 'competition' &&
               <div style={{ width: 'var(--playFieldWidth)', height: 'var(--playFieldHeight)', boxSizing: 'content-box', borderWidth: '0.2vh', boxShadow: '0 0 1rem 0rem rgba(255,255,255)' }}
                 className=" relative bg-black box-border">
-                <BasicModal isAIPage={true}/>
+                <BasicModal isAIPage={true} />
                 <PlayField AIcontrol={true} />
               </div>}
           </div>
