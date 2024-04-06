@@ -195,3 +195,8 @@ body {
   width: var(--brickWidth);
   height: var(--brickWidth);
 }
+
+.brick_border {
+  border: 1px solid #1c1c1cff;
+  box-sizing: content-box;
+}

@@ -6,21 +6,21 @@ import { MdArrowLeft, MdArrowRight } from "react-icons/md";
 type SettingProps = {};
 
 const Setting: React.FC<SettingProps> = () => {
-const { setModal, settings, setSettings } = useGameBoard();
+  const { setModal, settings, setSettings } = useGameBoard();
 
-    const handleDone = () => {
-        setModal("mainMenu");
-    };
+  const handleDone = () => {
+    setModal("mainMenu");
+  };
 
   const adjustSetting = (key: keyof typeof settings, increment: boolean) => {
     if (key === "volume") {
-        const newVolume = increment ? settings.volume + 1 : settings.volume - 1;
+      const newVolume = increment ? settings.volume + 1 : settings.volume - 1;
       setSettings({ volume: Math.max(0, Math.min(100, newVolume)) });
     } else {
-        const currentValue = settings[key];
-        if (typeof currentValue === "boolean") {
-            setSettings({ [key]: !currentValue });
-        }
+      const currentValue = settings[key];
+      if (typeof currentValue === "boolean") {
+        setSettings({ [key]: !currentValue });
+      }
     }
   };
 

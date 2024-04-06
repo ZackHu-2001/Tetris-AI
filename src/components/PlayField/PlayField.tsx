@@ -6,7 +6,7 @@ type PlayFieldProps = {
 };
 
 const PlayField: React.FC<PlayFieldProps> = ({ AIcontrol }) => {
-    const { setStatus, setModal, board, board_AI, setAIready, moveDown, moveLeft, moveRight, 
+    const { setStatus, setModal, board, board_AI, setAIready, moveDown, moveLeft, moveRight, settings,
         fallingTetromino, drop, clockWiseRotate, anticlockWiseRotate, keyBindings } = useGameBoard()
     const rowNum = 20;
     const colNum = 10;
@@ -62,7 +62,7 @@ const PlayField: React.FC<PlayFieldProps> = ({ AIcontrol }) => {
                 return (<div style={{ height: '5%' }} className='w-full flex ' key={rowIndex}>
                     {Array.from({ length: colNum }).map((_, i) => {
                         return (
-                            <div className={row[i] ? mapColor(row[i]) : 'empty_brick'} key={rowIndex * 10 + i}></div>
+                            <div className={`${row[i] ? mapColor(row[i]) : settings.grid ? 'empty_brick brick_border' : 'empty_brick'}`} key={rowIndex * 10 + i}></div>
                         )
                     })}
                 </div>)
