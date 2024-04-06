@@ -270,13 +270,19 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     board: [],
 
     updateBoard: () => {
+        console.log("update board")
         set((state) => {
             const newBoard: GameBoard = Array(rowNum).fill(undefined).map(() => Array(colNum).fill(0));
             const ghost = getGhostPosition(state)
             for (let i = 0; i < rowNum; i++) {
                 for (let j = 0; j < colNum; j++) {
-                    newBoard[i][j] = state.gameBoard[i][j] || state.fallingTetromino[i][j] || ghost[i][j];
+                    newBoard[i][j] = state.gameBoard[i][j] || state.fallingTetromino[i][j]
+                    if (get().settings.ghost) {
+                        newBoard[i][j] = newBoard[i][j] || ghost[i][j]
+                    // get().settings.ghost ? ghost[i][j] : 1;
+                    }
                 }
+                console.log(newBoard[i].slice())
             }
             return { board: newBoard };
         });

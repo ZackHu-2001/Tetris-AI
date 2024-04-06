@@ -7,12 +7,8 @@ type PlayFieldProps = {
 
 const PlayField: React.FC<PlayFieldProps> = ({ AIcontrol }) => {
     const { setStatus, setModal, board, board_AI, setAIready, moveDown, moveLeft, moveRight, settings,
-        fallingTetromino, drop, clockWiseRotate, anticlockWiseRotate, keyBindings } = useGameBoard()
-    const rowNum = 20;
+    drop, clockWiseRotate, anticlockWiseRotate, keyBindings } = useGameBoard()
     const colNum = 10;
-    const boardLength = Object.keys(board).length;
-    let counted = false;
-    let tetrominoCopy = [];
 
     let gameBoard = AIcontrol ? board_AI : board;
 
@@ -33,7 +29,6 @@ const PlayField: React.FC<PlayFieldProps> = ({ AIcontrol }) => {
                     drop();
                     break;
                 case 'Escape':
-                    // TODO show the pause menu
                     setStatus('paused');
                     setModal('pauseMenu');
                     setAIready(false);
