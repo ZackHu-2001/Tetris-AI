@@ -2,8 +2,6 @@ import { create } from "zustand";
 import { getDisplayNameForKey } from './Modal/Control';
 
 const generatePackCnt = 100;
-// const serverAPI = 'https://18.226.187.27:8000/process';
-// const serverAPI = 'http://127.0.0.1:5001/tetris-group6/us-central1/get_next_action'
 const serverAPI = 'https://api.zackhu.com/process'
 
 export type GameState = {
@@ -21,13 +19,17 @@ export type KeyBinding = {
     displayName: string | JSX.Element;
 };
 
-interface NextStateDictionary {
-    [key: string]: number[];
+export enum AIdifficulty {
+    easy = 'easy',
+    medium = 'medium',
+    hard = 'hard',
 }
+
 export type GameSettings = {
     sound: boolean;
-    gravity: boolean;
     volume: number;
+    gravity: boolean;
+    AI: AIdifficulty;
     ghost: boolean;
     grid: boolean;
 };
@@ -122,7 +124,7 @@ interface gameBoardInterface {
     setLines_AI: (lines: number) => void;
     addScore_AI: (linesCleared: number) => void;
     checkAndClearLines_AI: () => void;
-    
+
     width: number;
     setWidth: (width: number) => void;
 }
@@ -279,10 +281,8 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                     newBoard[i][j] = state.gameBoard[i][j] || state.fallingTetromino[i][j]
                     if (get().settings.ghost) {
                         newBoard[i][j] = newBoard[i][j] || ghost[i][j]
-                    // get().settings.ghost ? ghost[i][j] : 1;
                     }
                 }
-                console.log(newBoard[i].slice())
             }
             return { board: newBoard };
         });
@@ -558,7 +558,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
         if (get().nextTetrominoQueue_AI.length <= 6) {
             get().addPack();
         }
-        
+
         const popedValue = pack[get().nextTetrominoQueue_AI[0]].map((row) => row.slice());
         get().setFallingShape_AI(popedValue);
         set((state) => ({
@@ -644,8 +644,9 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
     settings: {
         sound: true,
-        gravity: true,
         volume: 50,
+        gravity: true,
+        AI: AIdifficulty.medium,
         ghost: true,
         grid: true,
     },
@@ -658,14 +659,15 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             },
         }));
     },
-    setVolume: (volume) =>
+
+    setVolume: (volume) => {
         set((state) => ({
             settings: {
                 ...state.settings,
                 volume: Math.max(0, Math.min(100, volume)), // Ensuring volume is between 0 and 100
             },
-        })),
-
+        }))
+    },
 
     AIready: false,
     setAIready: (isReady: boolean) => set((state) => ({ AIready: isReady })),
@@ -970,7 +972,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                 get().setWinOrLose("lose");
             }
         }
-        
+
         // check if the top line is full
         // if so, AI lose
         if (!get().gameBoard_AI[0].every(val => val === 0) || !get().gameBoard_AI[1].every(val => val === 0)) {
@@ -984,7 +986,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     setWidth: (width: number) => {
         set({ width });
     }
-    
+
 }));
 
 function rotate(tetromino: number[][], direction: number) {

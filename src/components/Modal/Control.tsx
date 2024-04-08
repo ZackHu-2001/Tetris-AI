@@ -48,7 +48,7 @@ const Control: React.FC<ControlProps> = () => {
     return () => {
       window.removeEventListener("keydown", handleKeyPress);
     };
-  }, [editingControl, keyBindings, setKeyBindings]);
+  }, [editingControl, keyBindings]);
 
   const handleDone = () => {
     setModal("mainMenu");

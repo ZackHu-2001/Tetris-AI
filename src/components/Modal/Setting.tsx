@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import MenuButton from "../MenuButton/MenuButton";
-import { useGameBoard } from "../GameBoard";
-import { MdArrowLeft, MdArrowRight } from "react-icons/md";
+import { useGameBoard, AIdifficulty } from "../GameBoard";
+import { FaChevronRight, FaChevronLeft } from "react-icons/fa";
 
 type SettingProps = {};
 
@@ -16,6 +16,11 @@ const Setting: React.FC<SettingProps> = () => {
     if (key === "volume") {
       const newVolume = increment ? settings.volume + 1 : settings.volume - 1;
       setSettings({ volume: Math.max(0, Math.min(100, newVolume)) });
+    } else if (key === 'AI') {
+      let choice = [AIdifficulty.easy, AIdifficulty.medium, AIdifficulty.hard];
+      let currentIndex = choice.indexOf(settings[key]);
+      const newDifficulty = increment ? choice[(currentIndex + 1) % 3] : choice[(currentIndex + 2) % 3];
+      setSettings({ AI: newDifficulty });
     } else {
       const currentValue = settings[key];
       if (typeof currentValue === "boolean") {
@@ -38,17 +43,17 @@ const Setting: React.FC<SettingProps> = () => {
             <span className="flex-1 text-left">
               {key.charAt(0).toUpperCase() + key.slice(1)}:
             </span>
-            <MdArrowLeft
-              className="text-40xl cursor-pointer"
+            <FaChevronLeft 
+              className=" cursor-pointer arrow"
               onClick={() => adjustSetting(settingKey, false)}
             />
             <span className="flex-1 text-center">
               {typeof value === "boolean" ? (value ? "On" : "Off") : value}
             </span>
-            <MdArrowRight
-              className="text-40xl cursor-pointer"
+            <FaChevronRight className="cursor-pointer arrow"
               onClick={() => adjustSetting(settingKey, true)}
             />
+
           </div>
         );
       })}

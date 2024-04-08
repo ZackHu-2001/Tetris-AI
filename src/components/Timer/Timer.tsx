@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useGameBoard } from "../GameBoard";
+import { AIdifficulty, useGameBoard } from "../GameBoard";
 
 type TimerProps = {
   fontSize: string;
@@ -7,7 +7,7 @@ type TimerProps = {
 
 const Timer: React.FC<TimerProps> = ({ fontSize = "5rem" }) => {
   const { gameState, moveDown, isNewGame, AIready, setIsNewGame, setOffSet,
-    moveDown_AI } = useGameBoard();
+    moveDown_AI, settings } = useGameBoard();
 
   const [time, setTime] = useState(0);
 
@@ -70,7 +70,7 @@ const Timer: React.FC<TimerProps> = ({ fontSize = "5rem" }) => {
 
     takeActionInterval = setInterval(() => {
       moveDown_AI();
-    }, 50);
+    }, settings.AI === AIdifficulty.easy ? 1000 : settings.AI === AIdifficulty.medium ? 500 : 200);
 
     if (gameState.status == "paused" || gameState.status == "gameOver") {
       clearInterval(takeActionInterval);
