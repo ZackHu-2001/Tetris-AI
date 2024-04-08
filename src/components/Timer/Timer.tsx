@@ -37,10 +37,11 @@ const Timer: React.FC<TimerProps> = ({ fontSize = "5rem" }) => {
         setTime((time) => time + 0.01);
       }, 10);
 
-      dropInterval = setInterval(() => {
-        moveDown();
-      }, 1000);
-
+      if (settings.gravity === true) {
+        dropInterval = setInterval(() => {
+          moveDown();
+        }, 1000);
+      }
     }
 
     if (gameState.status == "paused") {
