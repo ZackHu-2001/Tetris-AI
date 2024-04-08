@@ -44,7 +44,7 @@ body {
 }
 
 .setting {
-  color: #ddbea9;
+  /* color: #ddbea9; */
   font-size: 4rem;
   font-weight: bold;
 }
@@ -54,12 +54,9 @@ body {
   font-weight: bold;
 }
 
-.my-6 {
-  color: #ddbea9;
-}
 .control-panel {
   font-size: 3rem;
-  color: #ddbea9;
+  /* color: #ddbea9; */
 }
 
 .control-panel .controls-container .control-item {
@@ -76,7 +73,8 @@ body {
   align-items: center;
   width: 24rem;
   height: 10rem;
-  background-color: #f0f0f0;
+  background-color: #ddbea9;
+  /* background-color: #f0f0f0; */
   border: 1px solid #ccc;
   border-radius: 2rem;
   cursor: pointer;
@@ -199,4 +197,9 @@ body {
 .brick_border {
   border: 1px solid #1c1c1cff;
   box-sizing: content-box;
+}
+
+.arrow:hover {
+  color: #ddbea9;
+  transition: color 0.3s; 
 }
