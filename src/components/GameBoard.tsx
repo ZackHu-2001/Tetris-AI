@@ -569,11 +569,12 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
 
     // set both score and lines according to the mode
     initializeStatusPanel: () => {
-        set({ score: 0 })
+        set({ score: 0, score_AI: 0})
         if (get().gameState.mode === 'sprint') {
             get().setLines(rowNum * 2);
         } else {
             get().setLines(0);
+            get().setLines_AI(0);
         }
     },
 
