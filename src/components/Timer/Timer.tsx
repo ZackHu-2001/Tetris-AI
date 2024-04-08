@@ -70,7 +70,7 @@ const Timer: React.FC<TimerProps> = ({ fontSize = "5rem" }) => {
 
     takeActionInterval = setInterval(() => {
       moveDown_AI();
-    }, settings.AI === AIdifficulty.easy ? 1000 : settings.AI === AIdifficulty.medium ? 500 : 200);
+    }, settings.AI === AIdifficulty.easy ? 500 : settings.AI === AIdifficulty.medium ? 250 : 75);
 
     if (gameState.status == "paused" || gameState.status == "gameOver") {
       clearInterval(takeActionInterval);
