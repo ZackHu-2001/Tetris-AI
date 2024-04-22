@@ -11,7 +11,7 @@ const RightPanel: React.FC<RightPanelProps> = () => {
         <>
             {gameState.mode === 'competition' ?
                 <div style={{ width: '16.5%' }} >
-                    <NextPanel nextTetrominoQueue={nextTetrominoQueue_AI} height={77}/>
+                    <NextPanel nextTetrominoQueue={nextTetrominoQueue_AI} height={55}/>
                     <StatusPanel AIcontrol={true}/>
                 </div>
                 :

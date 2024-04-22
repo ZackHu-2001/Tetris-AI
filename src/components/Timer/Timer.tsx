@@ -84,21 +84,19 @@ const Timer: React.FC<TimerProps> = ({ fontSize = "5rem" }) => {
 
   return (
     <>
-      {
-        gameState.mode !== 'competition' && <div
-          style={{ paddingLeft: "2rem", paddingRight: "2rem" }}
-          className="w-full flex ">
-          {formatTime(time)
-            .split("")
-            .map((char: string, index: number) => {
-              return (
-                <div key={index} style={{ fontSize }} className="timer-char">
-                  {char}
-                </div>
-              );
-            })}
-        </div>
-      }
+      <div
+        style={{ paddingLeft: "2rem", paddingRight: "2rem" }}
+        className="w-full flex ">
+        {formatTime(time)
+          .split("")
+          .map((char: string, index: number) => {
+            return (
+              <div key={index} style={{ fontSize }} className="timer-char">
+                {char}
+              </div>
+            );
+          })}
+      </div>
     </>
 
   );
