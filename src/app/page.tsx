@@ -1,10 +1,11 @@
 "use client";
 import PlayField from "@/components/PlayField/PlayField";
 import BasicModal from "@/components/Modal/BasicModal";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import LeftPanel from "@/components/Panels/LeftPanel/LeftPanel";
 import RightPanel from "@/components/Panels/RightPanel/RightPanel";
 import { useGameBoard } from "@/components/GameBoard";
+import { SoundProvider, useSound } from "@/contexts/SoundContext";
 
 export default function Home() {
   const [dimensions, setDimensions] = useState({
@@ -61,6 +62,7 @@ export default function Home() {
 
 
   return (
+    <SoundProvider>
     <div className="flex justify-center">
       <div
         style={{ width: gameState.mode === 'competition' ? 'var(--AIModeWidth)' : 'var(--bgWidth)', backgroundColor: 'rgba(0,0,0, 0.5)' }}
@@ -89,5 +91,6 @@ export default function Home() {
         </div>
       </div>
     </div>
+    </SoundProvider>
   );
 }

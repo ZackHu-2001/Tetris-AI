@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useGameBoard } from '../GameBoard';
-
+import { useSound } from '../../contexts/SoundContext';
 type PlayFieldProps = {
     AIcontrol: boolean;
 };
@@ -8,6 +8,7 @@ type PlayFieldProps = {
 const PlayField: React.FC<PlayFieldProps> = ({ AIcontrol }) => {
     const { setStatus, setModal, board, board_AI, setAIready, moveDown, moveLeft, moveRight, settings,
     drop, clockWiseRotate, anticlockWiseRotate, keyBindings } = useGameBoard()
+    const { playMoveSound } = useSound();
     const colNum = 10;
 
     let gameBoard = AIcontrol ? board_AI : board;
@@ -15,6 +16,10 @@ const PlayField: React.FC<PlayFieldProps> = ({ AIcontrol }) => {
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             event.preventDefault();
+            if (settings.sound) {
+                playMoveSound();
+            }
+
             switch (event.code) {
                 case keyBindings.moveDown.code:
                     moveDown();

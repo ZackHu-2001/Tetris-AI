@@ -174,6 +174,16 @@ const getGhostPosition = (state: gameBoardInterface): Tetromino => {
     return ghost;
 }
 
+function callSoundEffect(type: 'clearLine' | 'lose' | 'win') {
+    if (!useGameBoard.getState().settings.sound) return;
+    const audio = new Audio(`/${type}.mp3`);
+    if (audio) {
+        audio.currentTime = 0;
+        audio.volume = useGameBoard.getState().settings.volume / 100;
+        audio.play();
+    }
+}
+
 export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     startGame: (mode: "sprint" | "endless" | "competition") => {
         // change global state
@@ -272,7 +282,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
     board: [],
 
     updateBoard: () => {
-        console.log("update board")
+        // console.log("update board")
         set((state) => {
             const newBoard: GameBoard = Array(rowNum).fill(undefined).map(() => Array(colNum).fill(0));
             const ghost = getGhostPosition(state)
@@ -612,6 +622,10 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             }
         }
 
+        if (cnt > 0) {
+            callSoundEffect('clearLine');
+        }
+
         // according to the lines cleared, update the score
         get().addScore(cnt);
 
@@ -628,6 +642,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             get().setStatus("gameOver");
             get().setModal("gameOver");
             get().setWinOrLose("win");
+            callSoundEffect('win');
         }
 
         // check if the top line is full
@@ -635,6 +650,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             get().setStatus("gameOver");
             get().setModal("gameOver");
             get().setWinOrLose("lose");
+            callSoundEffect('lose');
         }
     },
 
@@ -971,6 +987,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
                 get().setStatus("gameOver");
                 get().setModal("gameOver");
                 get().setWinOrLose("lose");
+                callSoundEffect('lose');
             }
         }
 
@@ -980,6 +997,7 @@ export const useGameBoard = create<gameBoardInterface>((set, get) => ({
             get().setStatus("gameOver");
             get().setModal("gameOver");
             get().setWinOrLose("win");
+            callSoundEffect('win');
         }
     },
 
