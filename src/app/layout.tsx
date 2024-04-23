@@ -5,7 +5,7 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Tetris by Group 6",
+  title: "Tetris AI Chanllenge",
   description: "Tetris implemented in TypeScript and React",
   icons: ['icon.svg']
 };
