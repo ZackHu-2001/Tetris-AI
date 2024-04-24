@@ -3,7 +3,7 @@
 This is a Tetris game build with React, with AI competition mode integrated.
 ### Open [tetris.zackhu.com](https://tetris.zackhu.com) to play!
 ### AI Competition Mode
-![AI competition mode](./public/AI_illustration.gif)
+![AI competition mode](./Demo/AI_illustration.gif)
 
 
 ### Feature:
@@ -14,13 +14,13 @@ This is a Tetris game build with React, with AI competition mode integrated.
 
 # Some Screenshots
 ### Main Menu
-![Main Menu](./public/main.png)
+![Main Menu](./Demo/main.png)
 
 ### Sprint Mode
-![Sprint Mode](./public/sprint.png)
+![Sprint Mode](./Demo/sprint.png)
 
 ### Setting Page
-![Setting Page](./public/setting.png)
+![Setting Page](./Demo/setting.png)
 
 
 **Folder structure:**
