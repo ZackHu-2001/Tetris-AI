@@ -18,7 +18,6 @@ const MainMenu: React.FC<MainMenuProps> = () => {
     return (
         <div style={{ fontSize: '5rem', fontWeight: 'bold' }} className='absolute w-full h-full left-0 top-0 flex flex-col justify-center items-center'>
             Tetris
-
             <MenuButton text="Play Sprint" onClick={()=>startGame('sprint')}></MenuButton>
             <MenuButton text="Infinite Mode" onClick={()=>startGame('endless')}></MenuButton>
             <MenuButton text="AI Challenge" onClick={() => startGame('competition')}></MenuButton>

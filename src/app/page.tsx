@@ -15,7 +15,6 @@ export default function Home() {
 
   const { gameState, setWidth } = useGameBoard();
 
-
   useEffect(() => {
     function handleResize() {
       setDimensions({
