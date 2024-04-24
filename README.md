@@ -1,18 +1,27 @@
 # Tetris AI Challenge
 
-
+This is a Tetris game build with React, with AI competition mode integrated.
 ### Open [tetris.zackhu.com](https://tetris.zackhu.com) to play!
+### AI Competition Mode
+![AI competition mode](./public/AI_illustration.gif)
+
 
 ### Feature:
+- This project's frontend is developed with React, Nextjs, tailwindCSS and Zustand.
+- Backend AI model is deployed on an AWS EC2 server.
 - Beside the sprint and infinite mode, **AI competition mode** is supported, with **3 dificulty levels.**
-- Easy level AI is implemented with **heuristic based method**, while medium and hard is implemented with **DQN**. 
+- Easy level AI is implemented with **heuristic based method**, which run in local machine, while medium and hard is implemented with **DQN**. 
 
+# Some Screenshots
+### Main Menu
+![Main Menu](./public/main.png)
 
-### AI Competition Mode
-![AI competition mode](./public/Screen%20Recording%202024-04-21%20at%202.50.13 PM.gif)
-<video>
-<source src="./public/AI_illustration.mov" type="video/mp4">
-</video> 
+### Sprint Mode
+![Sprint Mode](./public/sprint.png)
+
+### Setting Page
+![Setting Page](./public/setting.png)
+
 
 **Folder structure:**
 ```
@@ -37,15 +46,6 @@ src
      | - GameBoard          - Store global game states
 ```
 
-**To accomplish:**
-- Create four distinct Modal pages, encompassing both UI construction and the implementation of their respective functionalities.
-- Develop NextPanel, PlayField, and StatusPanel concurrently, as they are closely interconnected.
-
-**Overall Milestones:**
-- M1: Develop a foundational UI for single-player mode implementation     (anticipated duration: one week).
-- M2: Integrate reinforcement learning into the competition mode          (anticipated duration: one week).
-- M3: Dedicate time to organizing, documenting, and reporting             (anticipated duration: one week).
-
 
 ## To run this project
 
@@ -65,4 +65,3 @@ npm run build
 ```
 
 
-## Deploy AI model on server
